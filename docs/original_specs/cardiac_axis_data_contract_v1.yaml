@@ -1,0 +1,1034 @@
+# Cardiac-axis project data contract
+# Encoding: UTF-8
+# This file is the machine-readable source of truth for formal data loading,
+# geometry semantics, split usage, version checks, and stop conditions.
+
+contract:
+  name: cardiac_axis_data_contract
+  version: "1.0"
+  status: active
+  project: early_pregnancy_fetal_cardiac_axis
+  created_date: "2026-08-04"
+  timezone: "Asia/Singapore"
+  language: "zh-CN"
+  yaml_version: "1.2"
+
+  purpose:
+    - Freeze the 1474-case formal dataset and deterministic five-fold split.
+    - Prevent old experimental outputs from being silently reused as formal results.
+    - Freeze case identity, path roles, label semantics, manual-line parsing, and angle conventions.
+    - Define cohort roles, leakage boundaries, metric-specific validity, and hard-stop rules.
+    - Bind the source-confirmed 15-candidate dictionary to the formal pipeline.
+
+  governing_specifications:
+    data_reading_spec:
+      identifier: CARDIAC_AXIS_DATA_READING_SPEC_v1.0
+      status: governing_reference
+    method_history:
+      identifier: CARDIAC_AXIS_METHOD_HISTORY_v1.0
+      status: historical_reference_only
+    candidate_diagnosis_spec:
+      identifier: CARDIAC_AXIS_CARD_CANDIDATE_DIAGNOSIS_SPEC_v1.0
+      status: governing_reference
+    candidate_dictionary:
+      identifier: CARDIAC_AXIS_CANDIDATE_DICTIONARY_v1.0
+      status: active
+
+  supersession_policy:
+    old_experiment_results_are_formal: false
+    old_experiment_results_allowed_uses:
+      - source_code_provenance
+      - historical_method_reconstruction
+      - candidate_definition_audit
+      - debugging_reference
+    old_experiment_results_forbidden_uses:
+      - formal_model_selection
+      - formal_performance_claims
+      - manuscript_main_results
+      - manuscript_ablation_results
+    formal_experiments_must_restart_from_clean_manifest: true
+
+immutable_assets:
+  manifest:
+    path: /data5/xjx/zaoyun/data/j/manifest/manifest.csv
+    sha256: 76a396b6149ddd567ca457c960d6b84312201eb0e602d27a98d77223be97335a
+    row_count: 1474
+    audit_status: PASS
+    role: formal_case_manifest
+    read_only: true
+
+  fold:
+    path: /data5/xjx/zaoyun/data/j/manifest/fold.csv
+    sha256: 9875a45c8a8a81133d54bd0c064c7b330936e73d9f10223bcb57b3cbacf05d8e
+    row_count: 1474
+    audit_status: PASS
+    role: formal_split_assignment
+    read_only: true
+
+  manifest_all:
+    path: /data5/xjx/zaoyun/data/j/manifest/manifest_all.csv
+    sha256: 0e534cd5b745dab806442269b9a5136538820f476fb02de6215b66087153a212
+    row_count: 1484
+    role: diagnostic_inventory_only
+    formal_training_or_evaluation_input: false
+    notes:
+      - Contains 1474 formal ready cases plus 10 incomplete legacy positive records.
+      - Never substitute this file for manifest.csv.
+
+  manifest_report:
+    path: /data5/xjx/zaoyun/data/j/manifest/report.xlsx
+    sha256: c54535b0029e213d425a80e9e1e328e7fc88c778dbb85fa841fcd9927090d0b6
+    role: manifest_audit_report
+    formal_training_or_evaluation_input: false
+
+  manifest_audit:
+    path: /data5/xjx/zaoyun/data/j/manifest/audit.txt
+    required_status: PASS
+    role: human_readable_audit
+    formal_training_or_evaluation_input: false
+
+  manifest_builder:
+    path: /data5/xjx/zaoyun/data/j/build_manifest.py
+    sha256: 0c234b51bf4b48c003779565155b32fa39248c7b317723e4e1d6a0df37a45c49
+    version: build_manifest_v1.1
+    role: provenance
+    formal_training_or_evaluation_input: false
+
+  candidate_dictionary:
+    path: /data5/xjx/zaoyun/data/j/config/CARDIAC_AXIS_CANDIDATE_DICTIONARY_v1.csv
+    sha256: 1f5a06a7cc789b2d6f275e462ed14f767c07e50910a7f83f2ffc49d91158a5da
+    row_count: 15
+    audit_status: PASS
+    role: formal_candidate_definition_registry
+    read_only: true
+
+  candidate_dictionary_audit:
+    path: /data5/xjx/zaoyun/data/j/config/CARDIAC_AXIS_CANDIDATE_DICTIONARY_v1_AUDIT.txt
+    required_status: PASS
+    role: candidate_dictionary_audit
+    formal_training_or_evaluation_input: false
+
+  candidate_dictionary_builder:
+    sha256: ac2afd0092aa9f5c9e95c4b8047d1c7a1cb6ff83c390a0cd98c3a4f85f59ce91
+    role: provenance
+    path_status: not_frozen_in_this_contract
+
+  historical_candidate_long_table:
+    path: /data5/xjx/zaoyun/data/region_axis_process_A_infer/cardiac_tail_failure_analysis_v1/cardiac_tail_failure_analysis_v1_candidate_errors.csv
+    sha256: 7f655ac9da0d0117fd0defa7fed01127038f0e5cd54d2297dbb56af246f3d25b
+    row_count: 22110
+    unique_uid_count: 1474
+    candidates_per_uid: 15
+    role: historical_name_and_structure_reference_only
+    formal_training_or_evaluation_input: false
+    formal_result_source: false
+
+expected_dataset:
+  classes:
+    allowed_values:
+      - Ne
+      - Po
+    semantics:
+      Ne: normal
+      Po: positive
+
+  cohorts:
+    allowed_values:
+      - retrospective
+      - multicenter
+      - prospective
+
+  counts:
+    retrospective:
+      Ne: 571
+      Po: 50
+      total: 621
+    multicenter:
+      Ne: 434
+      Po: 8
+      total: 442
+    prospective:
+      Ne: 400
+      Po: 11
+      total: 411
+    overall:
+      Ne: 1405
+      Po: 69
+      total: 1474
+
+  cohort_roles:
+    retrospective:
+      role: development
+      split_role: development_5fold
+      allowed_for_training: true
+      allowed_for_internal_validation: true
+      allowed_for_model_selection: true
+      formal_prediction_mode: out_of_fold
+    multicenter:
+      role: external_test
+      split_role: external_test
+      allowed_for_training: false
+      allowed_for_internal_validation: false
+      allowed_for_model_selection: false
+      formal_prediction_mode: frozen_external_evaluation
+    prospective:
+      role: prospective_test
+      split_role: external_test
+      allowed_for_training: false
+      allowed_for_internal_validation: false
+      allowed_for_model_selection: false
+      formal_prediction_mode: frozen_external_evaluation
+
+identity_contract:
+  uid:
+    expression: case_id + "|" + class + "|" + cohort
+    separator: "|"
+    required: true
+    unique: true
+    nonempty: true
+    expected_unique_count: 1474
+
+  composite_key:
+    fields:
+      - case_id
+      - class
+      - cohort
+    unique: true
+    expected_unique_count: 1474
+
+  patient_and_group_fields:
+    patient_id:
+      current_source: case_id
+      interpretation: unverified_patient_identity
+    fold_group_id:
+      current_source: case_id
+      required_nonempty_for_retrospective: true
+    fold_group_source:
+      required_value: case_id
+
+  terminology_constraint:
+    current_split_may_be_called:
+      - case_id_grouped_five_fold
+      - case_level_group_aware_five_fold
+    current_split_must_not_be_called:
+      - patient_level_five_fold
+    exception:
+      condition: case_id_has_been_independently_confirmed_as_patient_level
+      then_patient_level_wording_allowed: true
+
+case_id_normalization:
+  input_scope:
+    - file_basename
+    - not_full_path
+
+  ordered_operations:
+    - operation: trim_outer_whitespace
+    - operation: replace_backslash_with_forward_slash
+    - operation: take_basename
+    - operation: repeatedly_remove_known_file_extensions
+      extensions:
+        - .jpg
+        - .jpeg
+        - .png
+        - .bmp
+        - .tif
+        - .tiff
+        - .json
+        - .tar
+        - .txt
+        - .csv
+        - .xlsx
+    - operation: remove_confirmed_label_suffixes
+      case_insensitive: true
+      suffixes:
+        - _jpg_Label
+        - _jpeg_Label
+        - _png_Label
+        - _bmp_Label
+        - _tif_Label
+        - _tiff_Label
+        - _Label
+        - _label
+        - -Label
+        - _mask
+        - _infer
+        - _gold
+        - _seg
+        - _pred
+    - operation: remove_explicit_frame_suffix
+      allowed_suffixes:
+        - _0000
+        - -0000
+        - " 0000"
+      forbidden_behavior:
+        - Do not remove a bare trailing 000 or 0000 without an explicit separator.
+        - Do not shorten a valid timestamp ending in zeros.
+    - operation: remove_all_remaining_whitespace
+    - operation: lowercase
+
+  invalid_normalized_values:
+    - ""
+    - "."
+    - ".."
+
+  hidden_file_policy:
+    skip_name_prefix: "."
+    skip_path_component: __MACOSX
+
+raw_source_contract:
+  data_root:
+    path: /data5/xjx/zaoyun/data/j
+    read_only: true
+
+  source_groups:
+    normal_retrospective_seg:
+      class: Ne
+      fixed_cohort: retrospective
+      requirement: at_least_one_root_exists
+      roots:
+        - path: /data5/xjx/zaoyun/data/j/正常胎儿/回顾性
+          observed_exists_at_manifest_build: true
+
+    normal_retrospective_axis:
+      class: Ne
+      fixed_cohort: retrospective
+      requirement: at_least_one_root_exists
+      roots:
+        - path: /data5/xjx/zaoyun/data/j/正常胎儿-已标心轴/回顾性-正常
+          observed_exists_at_manifest_build: true
+
+    normal_prospective_seg:
+      class: Ne
+      fixed_cohort: prospective
+      requirement: at_least_one_root_exists
+      roots:
+        - path: /data5/xjx/zaoyun/data/j/正常胎儿/前瞻性
+          observed_exists_at_manifest_build: true
+
+    normal_prospective_axis:
+      class: Ne
+      fixed_cohort: prospective
+      requirement: at_least_one_root_exists
+      roots:
+        - path: /data5/xjx/zaoyun/data/j/正常胎儿-已标心轴/前瞻性-正常
+          observed_exists_at_manifest_build: true
+
+    normal_multicenter_seg:
+      class: Ne
+      fixed_cohort: multicenter
+      requirement: at_least_one_root_exists
+      roots:
+        - path: /data5/xjx/zaoyun/data/j/正常胎儿/多中心
+          observed_exists_at_manifest_build: true
+
+    normal_multicenter_axis:
+      class: Ne
+      fixed_cohort: multicenter
+      requirement: at_least_one_root_exists
+      roots:
+        - path: /data5/xjx/zaoyun/data/j/正常胎儿-已标心轴/多中心-正常
+          observed_exists_at_manifest_build: true
+        - path: /data5/xjx/zaoyun/data/j/正常胎儿-已标心轴/多中心
+          observed_exists_at_manifest_build: false
+
+    positive_seg:
+      class: Po
+      cohort_source: infer_from_path
+      requirement: at_least_one_root_exists
+      roots:
+        - path: /data5/xjx/zaoyun/data/j/阳性病例
+          observed_exists_at_manifest_build: false
+        - path: /data5/xjx/zaoyun/data/j/阳性病例_旧的
+          observed_exists_at_manifest_build: true
+
+    positive_axis:
+      class: Po
+      cohort_source: infer_from_path
+      requirement: at_least_one_root_exists
+      roots:
+        - path: /data5/xjx/zaoyun/data/j/阳性病例-心轴
+          observed_exists_at_manifest_build: true
+
+  cohort_inference_for_positive_files:
+    precedence:
+      - match: 前瞻
+        cohort: prospective
+      - match: 多中心
+        cohort: multicenter
+      - match: 回顾
+        cohort: retrospective
+    unresolved_value: unknown
+    unresolved_is_blocking: true
+
+file_role_contract:
+  allowed_roles:
+    - img
+    - axis_img
+    - label_gold
+    - label_infer
+    - axis_label
+
+  required_roles_for_formal_case:
+    - img
+    - label_gold
+    - label_infer
+    - axis_label
+
+  role_semantics:
+    img:
+      description: Original image from the segmentation dataset.
+      may_be_replaced_by_axis_img: false
+    axis_img:
+      description: Image stored with the manual cardiac-axis annotation.
+      required_for_formal_case: false
+      model_input_by_default: false
+    label_gold:
+      description: Gold segmentation label map.
+    label_infer:
+      description: Inference segmentation label map used for automated geometry.
+    axis_label:
+      description: TAR or JSON containing manual MeasureModel lines.
+
+  selection_policy:
+    zero_candidates: MISSING
+    one_candidate: UNIQUE
+    multiple_candidates: AMBIGUOUS
+    silent_preferred_path_selection: forbidden
+    explicit_override_allowed: true
+    explicit_override_requirements:
+      - selected_path_exists
+      - selected_path_is_one_of_scanned_candidates
+      - exact_match_on_case_id_class_cohort_and_role
+    allowed_selection_status_for_formal_case:
+      - UNIQUE
+      - OVERRIDE
+
+manifest_contract:
+  file: /data5/xjx/zaoyun/data/j/manifest/manifest.csv
+  expected_rows: 1474
+  only_ready_cases: true
+  required_ready_value: true
+
+  core_required_columns:
+    - manifest_version
+    - uid
+    - case_id
+    - patient_id
+    - fold_group_id
+    - fold_group_source
+    - class
+    - cohort
+    - subgroup
+    - img_path
+    - axis_img_path
+    - label_gold_path
+    - label_infer_path
+    - axis_label_path
+    - path_ready
+    - content_ready
+    - ready_for_axis_measurement
+    - status
+    - source_types
+    - scanned_file_count
+    - all_scanned_paths
+
+  selection_audit_roles:
+    - img
+    - axis_img
+    - label_gold
+    - label_infer
+    - axis_label
+
+  required_selection_audit_fields_per_role:
+    - "{role}_candidate_count"
+    - "{role}_candidates"
+    - "{role}_selection_status"
+    - "{role}_selection_reason"
+
+  required_image_validation_columns:
+    - image_content_ok
+    - image_height
+    - image_width
+    - image_channels
+    - image_fail_reason
+
+  required_mask_validation_prefixes:
+    - gold
+    - infer
+
+  required_mask_validation_fields_per_prefix:
+    - "{prefix}_content_ok"
+    - "{prefix}_height"
+    - "{prefix}_width"
+    - "{prefix}_ndim"
+    - "{prefix}_selected_channel"
+    - "{prefix}_unique_count"
+    - "{prefix}_unique_values"
+    - "{prefix}_id1_pixel_count"
+    - "{prefix}_id4_pixel_count"
+    - "{prefix}_id5_pixel_count"
+    - "{prefix}_id6_pixel_count"
+    - "{prefix}_channel_scores_json"
+    - "{prefix}_fail_reason"
+
+  required_axis_label_validation_columns:
+    - axis_label_content_ok
+    - axis_json_object_count
+    - axis_measure_model_item_count
+    - valid_manual_line_count
+    - axis_tar_member_names
+    - axis_json_encodings
+    - axis_line_sources
+    - axis_label_fail_reason
+    - manual_line0_p1_x
+    - manual_line0_p1_y
+    - manual_line0_p2_x
+    - manual_line0_p2_y
+    - manual_line0_length
+    - manual_line0_angle
+    - manual_line1_p1_x
+    - manual_line1_p1_y
+    - manual_line1_p2_x
+    - manual_line1_p2_y
+    - manual_line1_length
+    - manual_line1_angle
+
+  formal_row_requirements:
+    path_ready: true
+    content_ready: true
+    ready_for_axis_measurement: true
+    status: OK
+    required_paths_must_exist:
+      - img_path
+      - label_gold_path
+      - label_infer_path
+      - axis_label_path
+    axis_img_path_may_be_empty: true
+
+fold_contract:
+  file: /data5/xjx/zaoyun/data/j/manifest/fold.csv
+  expected_rows: 1474
+  uid_set_must_equal_manifest_uid_set: true
+  duplicate_uid_allowed: false
+
+  added_required_columns:
+    - fold
+    - split_role
+    - fold_assignment_method
+
+  development:
+    cohort: retrospective
+    expected_rows: 621
+    fold_values:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+    split_role: development_5fold
+    n_splits: 5
+    shuffle: true
+    random_state: 2026
+    group_field: fold_group_id
+    stratification_field: class
+    primary_method: StratifiedGroupKFold
+    fallback_method:
+      name: StratifiedKFold
+      allowed_only_when_each_fold_group_occurs_once: true
+    group_leakage_allowed: false
+
+    observed_validation_counts:
+      fold_0:
+        Ne: 114
+        Po: 10
+        total: 124
+      fold_1:
+        Ne: 115
+        Po: 9
+        total: 124
+      fold_2:
+        Ne: 114
+        Po: 10
+        total: 124
+      fold_3:
+        Ne: 114
+        Po: 10
+        total: 124
+      fold_4:
+        Ne: 114
+        Po: 11
+        total: 125
+
+  external:
+    cohorts:
+      - multicenter
+      - prospective
+    fold_value: -1
+    split_role: external_test
+    fold_assignment_method: not_applicable_external
+    model_selection_allowed: false
+
+content_validation_contract:
+  image:
+    reader: cv2.imread
+    read_mode: IMREAD_UNCHANGED
+    allowed_ndim:
+      - 2
+      - 3
+    nonempty_height_and_width: true
+
+  masks:
+    reader: cv2.imread
+    read_mode: IMREAD_UNCHANGED
+    expected_label_ids:
+      - 1
+      - 4
+      - 5
+      - 6
+    maximum_selected_channel_unique_values: 64
+
+    channel_selection:
+      two_dimensional_mask_selected_channel: -1
+      three_dimensional_channel_limit: first_3_channels
+      ranking_descending:
+        - card_pixel_count
+        - expected_label_pixel_count
+        - negative_unique_count
+      card_label_ids:
+        - 4
+        - 5
+
+    formal_content_requirements:
+      selected_channel_contains_at_least_one_expected_label_pixel: true
+      selected_channel_unique_count_at_most_64: true
+      every_expected_label_id_required_at_manifest_stage: false
+
+    metric_specific_label_absence_policy:
+      global_case_removal: false
+      action:
+        - mark_relevant_axis_invalid
+        - exclude_only_from_that_metric
+        - report_metric_specific_N_valid
+
+  axis_label:
+    supported_suffixes:
+      - .tar
+      - .json
+    tar_read_mode: r:*
+    maximum_tar_member_bytes: 67108864
+    accepted_json_encodings_in_order:
+      - utf-8
+      - utf-8-sig
+      - gbk
+      - cp936
+    measure_model_search: recursive
+    measure_model_key: MeasureModel
+    line_endpoint_path:
+      p1: Pos.p1
+      p2: Pos.p2
+    minimum_valid_line_length: 1.0e-6
+    valid_manual_line_count_required: 2
+    truncating_more_than_two_lines: forbidden
+    accepting_fewer_than_two_lines: forbidden
+
+label_semantics:
+  id_1:
+    name: reference_center_region
+    downstream_role: reference_axis_endpoint_region
+  id_4:
+    name: cardiac_region_4
+    downstream_role: cardiac_axis_region
+  id_5:
+    name: cardiac_region_5
+    downstream_role: cardiac_axis_region
+  id_6:
+    name: body_or_thoracic_reference_region
+    downstream_role: reference_axis_endpoint_region
+
+  source_usage:
+    label_gold:
+      allowed_uses:
+        - gold_geometry_for_manual_line_semantic_assignment
+        - segmentation_quality_analysis
+        - oracle_or_diagnostic_analysis_when_explicitly_named
+      forbidden_uses:
+        - inference_time_candidate_generation
+        - inference_time_model_input
+    label_infer:
+      allowed_uses:
+        - fixed_geometry_prediction
+        - inference_time_candidate_generation
+        - geometry_feature_extraction
+
+manual_axis_contract:
+  raw_lines:
+    count: 2
+    raw_names:
+      - manual_line0
+      - manual_line1
+    raw_order_has_no_fixed_semantics: true
+    endpoints_have_anatomical_meaning: false
+    endpoint_or_keypoint_primary_formulation_allowed: false
+
+  angle_computation:
+    each_line_computed_independently: true
+    formula: degrees(atan2(p2_y - p1_y, p2_x - p1_x)) modulo 180
+    output_range: "[0, 180)"
+    cross_image_endpoint_mapping: forbidden
+    endpoint_distance_matching: forbidden
+    line_overlap_matching: forbidden
+    center_mapping_for_semantic_assignment: forbidden
+
+  semantic_assignment:
+    required: true
+    assignment_scope: one_time_per_case
+    candidates:
+      assignment_A:
+        manual_card_axis: manual_line0_angle
+        manual_ref_axis: manual_line1_angle
+      assignment_B:
+        manual_card_axis: manual_line1_angle
+        manual_ref_axis: manual_line0_angle
+
+    selection_rule:
+      objective: minimize_total_axial_direction_cost_to_gold_geometry
+      total_cost: card_axial_error + ref_axial_error
+      gold_card_axis_source: label_gold_fixed_geometry
+      gold_ref_axis_source: label_gold_fixed_geometry
+      tie_policy:
+        silent_arbitrary_choice: forbidden
+        required_action:
+          - record_both_costs
+          - record_assignment_margin
+          - flag_for_review
+
+    required_outputs:
+      - manual_assignment
+      - manual_assignment_cost_A
+      - manual_assignment_cost_B
+      - manual_assignment_margin
+      - manual_card_axis
+      - manual_ref_axis
+      - manual_full_angle
+
+    freeze_after_assignment: true
+    per_candidate_manual_line_reselection: forbidden
+
+angle_contract:
+  units: degrees
+
+  axial_direction:
+    periodicity: 180.0
+    normalize_formula: theta modulo 180
+    normalized_range: "[0, 180)"
+    signed_difference_formula: "((pred - gt + 90) modulo 180) - 90"
+    signed_difference_range: "[-90, 90)"
+    absolute_error_formula: absolute_value(signed_axial_difference)
+
+  full_angle:
+    meaning: acute_angle_between_card_axis_and_reference_axis
+    formula: "min(abs(card - ref) modulo 180, 180 - (abs(card - ref) modulo 180))"
+    range: "[0, 90]"
+    signed_error_formula: predicted_full_angle - manual_full_angle
+    absolute_error_formula: absolute_value(predicted_full_angle - manual_full_angle)
+
+fixed_geometry_contract:
+  definition_status: locked
+  formal_regeneration_status: pending
+  formal_result_path: null
+  old_result_path_may_be_used_as_formal: false
+
+  connected_components:
+    connectivity: 8
+    component_policy: largest_connected_component_per_label
+
+  card_axis:
+    label_source_for_prediction: label_infer
+    region_ids:
+      - 4
+      - 5
+    region_axis_method: OBB_long_axis
+    obb_implementation:
+      contour_retrieval: RETR_EXTERNAL
+      contour_selection: largest_contour
+      rectangle_method: cv2.minAreaRect
+      axis_choice: longest_box_edge_direction
+    regional_weight: "area * max(OBB_aspect - 1.0, 0.05)"
+    fusion_method: 180_degree_double_angle_weighted_mean
+    validity:
+      minimum_valid_regions: 1
+      if_only_one_region_valid: use_that_region_axis
+      if_no_region_valid: invalid
+
+  reference_axis:
+    label_source_for_prediction: label_infer
+    source_region_id: 6
+    target_region_id: 1
+    point_definition: largest_component_centroid
+    direction: id6_centroid_to_id1_centroid
+    validity:
+      both_centroids_required: true
+
+  full_angle:
+    requires_valid_card_axis: true
+    requires_valid_reference_axis: true
+    computation: acute_angle_between_lines
+
+  gold_geometry_for_manual_assignment:
+    same_geometry_rules_as_prediction: true
+    label_source: label_gold
+
+candidate_contract:
+  dictionary_path: /data5/xjx/zaoyun/data/j/config/CARDIAC_AXIS_CANDIDATE_DICTIONARY_v1.csv
+  dictionary_sha256: 1f5a06a7cc789b2d6f275e462ed14f767c07e50910a7f83f2ffc49d91158a5da
+  expected_candidate_count: 15
+  expected_geometry_candidate_count: 14
+  expected_tree_candidate_count: 1
+
+  expected_candidate_names:
+    - fixed_weighted_obb
+    - corrected_tree
+    - id4_obb_feat
+    - id5_obb_feat
+    - id4_pca_feat
+    - id5_pca_feat
+    - weighted_obb_feat
+    - weighted_pca_feat
+    - id4_id5_centroid
+    - union45_obb_mask
+    - union45_pca_mask
+    - id4_obb_mask
+    - id5_obb_mask
+    - id4_pca_mask
+    - id5_pca_mask
+
+  historical_oracles:
+    geometry_oracle:
+      candidate_count: 14
+      includes_corrected_tree: false
+    all_candidate_oracle:
+      candidate_count: 15
+      includes_corrected_tree: true
+
+  inference_gt_policy:
+    manual_axis_used_to_generate_geometry_candidate: false
+    manual_axis_used_as_tree_inference_input: false
+    manual_axis_allowed_for_error_and_oracle_computation: true
+
+  formal_diagnosis_policy:
+    candidate_deletion_before_diagnosis: forbidden
+    raw_name_margin_as_final_ambiguity_measure: forbidden
+    distinct_axis_clustering_required: true
+    external_cohorts_for_route_selection: forbidden
+
+formal_experiment_contract:
+  current_stage:
+    clean_manifest: complete
+    formal_fold: complete
+    candidate_dictionary: complete
+    fixed_geometry_baseline: pending
+    candidate_generation: pending_formal_regeneration
+    candidate_diagnosis: pending
+    supervised_candidate_selector: pending
+
+  allowed_training_data:
+    cohort: retrospective
+    prediction_requirement_for_formal_development_metrics: out_of_fold
+
+  forbidden_training_data:
+    - multicenter
+    - prospective
+
+  model_selection:
+    allowed_source: retrospective_out_of_fold_only
+    external_metric_ranking: forbidden
+    external_threshold_tuning: forbidden
+    external_feature_selection: forbidden
+    external_architecture_selection: forbidden
+
+  method_constraints:
+    endpoint_keypoint_method_for_measurement_line: forbidden
+    few_shot_or_small_sample_wording_for_fully_supervised_selector: forbidden
+    preferred_selector_terms:
+      - supervised_candidate_selector
+      - geometry_aware_candidate_selector
+      - lightweight_supervised_geometric_selector
+
+  reference_axis_policy:
+    primary_improvement_target: card_axis
+    reference_axis_must_remain_fixed_unless_explicitly_versioned: true
+
+evaluation_contract:
+  clinical_primary_target:
+    name: full_angle
+    error_type: scalar_absolute_error
+    units: degrees
+
+  diagnostic_targets:
+    - card_axis
+    - reference_axis
+
+  validity_reporting:
+    separate_N_valid_required_for:
+      - manual_card_axis
+      - manual_ref_axis
+      - manual_full_angle
+      - predicted_card_axis
+      - predicted_ref_axis
+      - predicted_full_angle
+      - each_candidate_axis
+    silent_denominator_change: forbidden
+
+  required_strata:
+    - overall
+    - retrospective_all
+    - retrospective_normal
+    - retrospective_positive
+    - multicenter_all
+    - multicenter_normal
+    - multicenter_positive
+    - prospective_all
+    - prospective_normal
+    - prospective_positive
+
+  external_reporting:
+    multicenter_and_prospective_reported_separately: true
+    external_pooling_allowed_for_descriptive_analysis: true
+    external_pooling_allowed_for_model_selection: false
+
+  minimum_required_metrics:
+    absolute_error:
+      - N_valid
+      - mean
+      - SD
+      - median
+      - Q1
+      - Q3
+      - P90
+      - P95
+      - max
+      - accuracy_below_3_deg
+      - accuracy_below_5_deg
+      - accuracy_below_7_deg
+      - accuracy_below_10_deg
+      - error_above_10_deg_count
+      - error_above_10_deg_percent
+    signed_error:
+      - N_valid
+      - mean_bias
+      - SD
+      - median
+      - Q1
+      - Q3
+
+version_chain_contract:
+  join_key: uid
+  one_to_one_join_required: true
+
+  every_formal_case_table_must_include:
+    - uid
+    - case_id
+    - class
+    - cohort
+
+  immutable_set_checks:
+    manifest_uid_count: 1474
+    fold_uid_count: 1474
+    manifest_fold_uid_sets_equal: true
+
+  required_provenance_per_generated_artifact:
+    - source_manifest_path
+    - source_manifest_sha256
+    - source_fold_path
+    - source_fold_sha256
+    - generating_script_path
+    - generating_script_sha256
+    - generation_timestamp
+    - contract_version
+    - feature_or_candidate_version_when_applicable
+    - random_seed_when_applicable
+
+  automatic_input_fallback:
+    allowed: false
+    reason: Different existing files must not silently change the formal version chain.
+
+  automatic_best_method_lookup:
+    allowed_for_formal_pipeline: false
+    required_behavior: Freeze the selected method name and source artifact explicitly.
+
+stop_conditions:
+  hard_fail:
+    - condition: manifest_file_missing
+    - condition: manifest_sha256_mismatch
+    - condition: fold_file_missing
+    - condition: fold_sha256_mismatch
+    - condition: candidate_dictionary_missing
+    - condition: candidate_dictionary_sha256_mismatch
+    - condition: manifest_audit_status_not_PASS
+    - condition: candidate_dictionary_audit_status_not_PASS
+    - condition: manifest_row_count_not_1474
+    - condition: fold_row_count_not_1474
+    - condition: manifest_uid_not_unique
+    - condition: fold_uid_not_unique
+    - condition: manifest_and_fold_uid_sets_differ
+    - condition: unexpected_class_value
+    - condition: unexpected_cohort_value
+    - condition: cohort_class_count_mismatch
+    - condition: required_formal_path_missing
+    - condition: required_formal_path_not_a_file
+    - condition: required_path_selection_ambiguous
+    - condition: unknown_cohort_file_in_formal_case_set
+    - condition: manual_valid_line_count_not_2
+    - condition: raw_manual_line_semantics_assumed_from_order
+    - condition: manual_line_reselected_per_candidate
+    - condition: retrospective_fold_outside_0_to_4
+    - condition: retrospective_split_role_not_development_5fold
+    - condition: external_fold_not_minus_1
+    - condition: external_split_role_not_external_test
+    - condition: fold_group_assigned_to_multiple_folds
+    - condition: external_data_used_for_model_selection
+    - condition: historical_result_used_as_formal_result
+    - condition: silent_input_file_fallback
+    - condition: silent_duplicate_row_drop
+    - condition: candidate_name_set_mismatch
+    - condition: inference_candidate_uses_manual_axis
+    - condition: cross_image_endpoint_or_center_mapping_used_for_manual_semantics
+
+  metric_specific_invalid_not_global_fail:
+    - condition: id4_absent_for_one_case
+      action: Recompute card validity from remaining valid card region; report N_valid.
+    - condition: id5_absent_for_one_case
+      action: Recompute card validity from remaining valid card region; report N_valid.
+    - condition: id1_or_id6_absent_for_one_case
+      action: Mark reference axis and full angle invalid for that case; report N_valid.
+    - condition: candidate_axis_missing_for_one_case
+      action: Keep the case in the master table; candidate-specific metric excludes only that value.
+
+pending_formal_artifacts:
+  fixed_geometry_case_table:
+    status: pending
+    path: null
+    required_contract_version: "1.0"
+
+  formal_candidate_long_table:
+    status: pending
+    path: null
+    required_candidate_count_per_uid: 15
+
+  formal_candidate_diagnosis_workbook:
+    status: pending
+    path: null
+
+  supervised_candidate_selector_outputs:
+    status: pending
+    path: null
+
+implementation_notes:
+  - manifest.csv, not manifest_all.csv, is the formal 1474-case input.
+  - fold.csv carries the same 1474 UIDs and adds fold assignment fields.
+  - The ten incomplete legacy positive records remain diagnostic-only and are not formal cases.
+  - Manifest readiness validates path identity, readability, and exactly two manual lines.
+  - Manifest readiness does not require every individual label ID to exist in every mask.
+  - Manual line endpoints are not anatomical landmarks and must not be converted into a keypoint task.
+  - Full-angle error is the clinical primary endpoint; card and reference errors are diagnostic.
+  - External cohorts are frozen evaluations and must remain excluded from method selection.
