@@ -1,0 +1,24 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Logs and system files
+*.log
+.DS_Store
+
+# Local datasets
+data/
+datasets/
+*.tar
+
+# nnUNet data and results
+nnUNet_raw/
+nnUNet_preprocessed/
+nnUNet_results/
