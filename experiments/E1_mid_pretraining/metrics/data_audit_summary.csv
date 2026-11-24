@@ -1,0 +1,58 @@
+section,item,scope,value,unit,note
+data,original_cases,all,905,cases,raw mid-trimester image/mask/annotation count before deduplication
+data,image_files,all,905,files,RGB uint8 PNG
+data,mask_files,all,905,files,single-channel uint8 PNG
+data,annotation_files,all,905,files,annotation_info JSON
+data,image_mask_annotation_stem_match,all,905/905,cases,all three source file types matched by reliable case stem
+data,image_mask_match,deduplicated,890/890,cases,retained cases with one image and one mask
+data,image_mask_shape_match,deduplicated,890/890,cases,image height/width equals mask height/width in every retained case
+data,duplicate_image_groups,all,15,groups,exact image SHA256 equality; 2 files per group
+data,duplicate_image_files,all,30,files,15 groups x 2
+data,deduplicated_cases,all,890,cases,one deterministic survivor per duplicate group
+data,excluded_duplicate_cases,all,15,cases,own original files retained on server
+data,empty_masks,deduplicated,0,cases,none observed in the 890 retained cases
+data,corrupt_files,deduplicated,0,files,none observed
+training,nnunetv2_version,fold_all,2.8.1,version,official nnU-Net v2
+training,configuration,fold_all,2d,configuration,2D segmentation
+training,fold,fold_all,all,fold,all cases used for training and same-data monitoring
+training,num_epochs,fold_all,300,epochs,300/300 completed
+training,plans_identifier,fold_all,nnUNetPlansFrom501,plans,official plans transfer from Dataset501
+label,id_0_case_count,deduplicated,890,cases,background required by nnU-Net
+label,id_1_case_count,deduplicated,890,cases,semantics unconfirmed
+label,id_2_case_count,deduplicated,890,cases,semantics unconfirmed
+label,id_3_case_count,deduplicated,890,cases,semantics unconfirmed
+label,id_4_case_count,deduplicated,890,cases,semantics unconfirmed
+label,id_5_case_count,deduplicated,890,cases,semantics unconfirmed
+label,id_6_case_count,deduplicated,890,cases,semantics unconfirmed
+label,id_7_case_count,deduplicated,890,cases,semantics unconfirmed
+label,id_8_case_count,deduplicated,890,cases,semantics unconfirmed
+label,id_9_case_count,deduplicated,890,cases,semantics unconfirmed
+label,id_0_pixel_count,deduplicated,103775479,pixels,aggregate over 890 retained masks
+label,id_1_pixel_count,deduplicated,6102508,pixels,aggregate over 890 retained masks
+label,id_2_pixel_count,deduplicated,8516377,pixels,aggregate over 890 retained masks
+label,id_3_pixel_count,deduplicated,5998988,pixels,aggregate over 890 retained masks
+label,id_4_pixel_count,deduplicated,7326260,pixels,aggregate over 890 retained masks
+label,id_5_pixel_count,deduplicated,14030476,pixels,aggregate over 890 retained masks
+label,id_6_pixel_count,deduplicated,122778788,pixels,aggregate over 890 retained masks
+label,id_7_pixel_count,deduplicated,23604272,pixels,aggregate over 890 retained masks
+label,id_8_pixel_count,deduplicated,2102085,pixels,aggregate over 890 retained masks
+label,id_9_pixel_count,deduplicated,2828123,pixels,aggregate over 890 retained masks
+training,completed_epochs,fold_all,300,epochs,300/300
+training,train_cases,fold_all,890,cases,all deduplicated cases
+training,monitoring_cases,fold_all,890,cases,same cases as training
+training,mean_epoch_time,fold_all,33.7102,seconds,sum of epoch timers divided by 300
+training,total_epoch_time,fold_all,2.8092,hours,sum of epoch timers
+monitoring,foreground_dice,fold_all_in_sample,0.9784,dice,NOT a held-out or generalization metric
+monitoring,foreground_iou,fold_all_in_sample,0.9581,iou,NOT a held-out or generalization metric
+monitoring,label_1_dice,fold_all_in_sample,0.9799,dice,semantics unconfirmed
+monitoring,label_2_dice,fold_all_in_sample,0.9829,dice,semantics unconfirmed
+monitoring,label_3_dice,fold_all_in_sample,0.9809,dice,semantics unconfirmed
+monitoring,label_4_dice,fold_all_in_sample,0.9832,dice,semantics unconfirmed
+monitoring,label_5_dice,fold_all_in_sample,0.9808,dice,semantics unconfirmed
+monitoring,label_6_dice,fold_all_in_sample,0.9853,dice,semantics unconfirmed
+monitoring,label_7_dice,fold_all_in_sample,0.9619,dice,semantics unconfirmed
+monitoring,label_8_dice,fold_all_in_sample,0.9844,dice,semantics unconfirmed
+monitoring,label_9_dice,fold_all_in_sample,0.9659,dice,semantics unconfirmed
+compatibility,non_seg_keys_matched,mid_vs_e0,382,keys,name and shape match
+compatibility,seg_layers_skipped,mid_vs_e0,14,keys,7-class E0 versus 10-class mid output head
+integrity,checkpoint_final_sha256,server_weight,df94a1d9aac1557a50d63856d684ef236508b45731dbcfd3479c85493314cd9f,sha256,weight not included in Git
