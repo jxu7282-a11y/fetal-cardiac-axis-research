@@ -22,3 +22,17 @@ datasets/
 nnUNet_raw/
 nnUNet_preprocessed/
 nnUNet_results/
+
+# Local working artifacts (derived manifests, folds, GT tables, predictions)
+local/
+
+# E0 archive: case-level results, identifiers, predictions, weights never go to Git
+**/*_cases.csv
+**/uid_to_file*.json
+*.pth
+*.b2nd
+*.npz
+*.nii
+*.nii.gz
+*.png
+experiments/**/case_level/

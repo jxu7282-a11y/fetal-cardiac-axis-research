@@ -1,0 +1,114 @@
+{
+  "experiment_id": "E0",
+  "name": "Early-trimester standard nnUNetv2 2D baseline",
+  "archived_at": "2026-11-24T13:40:00+08:00",
+  "dataset": {
+    "task": "Dataset501_EarlyRetroCardiac",
+    "modality": "2D fetal cardiac ultrasound (early trimester only)",
+    "image_channels": 3,
+    "label_ids": {
+      "0": "background",
+      "1": "reference_center",
+      "2": "label_2 (not used by geometry)",
+      "3": "label_3 (not used by geometry)",
+      "4": "cardiac_region_4",
+      "5": "cardiac_region_5",
+      "6": "thorax_reference"
+    },
+    "num_training": 621,
+    "num_external_test": 853,
+    "cohorts": {
+      "retrospective": {"total": 621, "Ne": 571, "Po": 50, "role": "5-fold development"},
+      "multicenter": {"total": 442, "Ne": 434, "Po": 8, "role": "external test"},
+      "prospective": {"total": 411, "Ne": 400, "Po": 11, "role": "prospective test"}
+    },
+    "formal_total": 1474
+  },
+  "data_reading_spec": "CARDIAC_AXIS_DATA_READING_SPEC_v1.0",
+  "method_history_version": "CARDIAC_AXIS_METHOD_HISTORY_v1.0",
+  "data_contract_version": "1.0",
+  "split": {
+    "source_file": "local/phase0/fold_v2.csv",
+    "nnunet_splits": "local/nnunet_preprocessed/Dataset501_EarlyRetroCardiac/splits_final.json",
+    "generator": "sklearn.model_selection.StratifiedKFold",
+    "n_splits": 5,
+    "shuffle": true,
+    "random_state": 42,
+    "stratify_on": "class (Ne/Po)",
+    "grouping_key": "case_id (case-record level; no patient grouping, no cross-cohort dedup)",
+    "fold_stats": {
+      "fold_0": {"train": 496, "train_Ne": 456, "train_Po": 40, "val": 125, "val_Ne": 115, "val_Po": 10},
+      "fold_1": {"train": 497, "train_Ne": 457, "train_Po": 40, "val": 124, "val_Ne": 114, "val_Po": 10},
+      "fold_2": {"train": 497, "train_Ne": 457, "train_Po": 40, "val": 124, "val_Ne": 114, "val_Po": 10},
+      "fold_3": {"train": 497, "train_Ne": 457, "train_Po": 40, "val": 124, "val_Ne": 114, "val_Po": 10},
+      "fold_4": {"train": 497, "train_Ne": 457, "train_Po": 40, "val": 124, "val_Ne": 114, "val_Po": 10}
+    },
+    "external_fold_id": -1,
+    "external_used_for_training_or_selection": false
+  },
+  "environment": {
+    "nnunetv2": "2.8.1",
+    "torch": "2.7.1+cu118",
+    "batchgenerators": "0.25.1",
+    "dynamic_network_architectures": "0.4.4",
+    "python": "3.10",
+    "hardware": "1x NVIDIA H20-3e (physical GPU 3), shared with other users",
+    "cuda_visible_devices": "3"
+  },
+  "trainer": {
+    "class": "nnUNetTrainer_300Epochs",
+    "base_class": "nnunetv2.training.nnUNetTrainer.nnUNetTrainer",
+    "source_file": "src/nnunet_ext/nnUNetTrainer_300Epochs.py",
+    "sole_deviation": "num_epochs = 300 (stock default 1000)",
+    "num_epochs": 300,
+    "num_iterations_per_epoch": 250,
+    "num_val_iterations_per_epoch": 50,
+    "initial_lr": 0.01,
+    "lr_scheduler": "PolyLRScheduler (horizon = num_epochs)",
+    "optimizer": "SGD (momentum 0.99, nesterov, weight_decay 3e-5)",
+    "loss": "DC+CE with deep supervision (nnUNet default)",
+    "enable_deep_supervision": true,
+    "oversample_foreground_percent": 0.33,
+    "save_every": 50
+  },
+  "configuration": {
+    "name": "2d",
+    "plans": "nnUNetPlans (stock, unmodified)",
+    "network": "PlainConvUNet",
+    "n_stages": 8,
+    "features_per_stage": [32, 64, 128, 256, 512, 512, 512, 512],
+    "parameters": 46335249,
+    "batch_size": 5,
+    "patch_size": [768, 768],
+    "spacing": [1.0, 1.0],
+    "normalization": "ZScoreNormalization",
+    "training_mode": "scratch (random initialization, no pretraining)",
+    "augmentation": "nnUNet default"
+  },
+  "inference": {
+    "internal_validation": {"tta": false, "checkpoint": "checkpoint_best.pth"},
+    "external_test": {"tta": false, "checkpoint": "checkpoint_best.pth", "ensemble_folds": [0, 1, 2, 3, 4]},
+    "note": "TTA disabled to keep internal and external protocols identical"
+  },
+  "ground_truth": {
+    "segmentation": "label_gold only (manual)",
+    "label_infer": "historical prediction, used only as external comparison reference, never for training",
+    "manual_measurement": "TAR MeasureModel, exactly 2 lines, undirected angle, angle-domain comparison only",
+    "manual_axis_assignment": "gold-assisted, frozen once per case"
+  },
+  "geometry_postprocessing": {
+    "card_axis": "OBB long axis of largest connected component of id4 and id5, weighted by area*max(aspect-1,0.05), double-angle weighted mean",
+    "ref_axis": "id6 centroid -> id1 centroid",
+    "full_angle": "acute angle between card_axis and ref_axis",
+    "resampling": "none; no pixel-level mapping between TAR and segmentation images"
+  },
+  "artifact_locations": {
+    "weights": "local/nnunet_results/Dataset501_EarlyRetroCardiac/nnUNetTrainer_300Epochs__nnUNetPlans__2d/fold_{0..4}/checkpoint_{best,final}.pth",
+    "train_logs": "local/phase0/e0_300ep_fold{0..4}.log",
+    "internal_predictions": "local/nnunet_results/Dataset501_EarlyRetroCardiac/nnUNetTrainer_300Epochs__nnUNetPlans__2d/fold_{0..4}/validation/",
+    "external_predictions": "local/phase0/e0_external_pred_ensemble/",
+    "metrics": "local/phase0/eval_E0_*",
+    "weights_total_size": "3.5 GB",
+    "weights_on_github": false
+  }
+}
