@@ -6,7 +6,7 @@ Status: complete (5/5 folds, 300 epochs each; formal evaluation done)
 ## What this is
 
 The flagship transfer experiment: early-trimester nnUNetv2 2D models are **initialized from
-the mid-trimester pretrained checkpoint** (`Mid_pretraining`) via nnU-Net's official
+the mid-trimester pretrained checkpoint** (`E1_mid_pretraining`) via nnU-Net's official
 `-pretrained_weights` loader, then fine-tuned on the early-trimester `Dataset501` five-fold
 split. It answers: *does cross-trimester pretraining improve early-trimester cardiac-axis
 measurement versus the E0 from-scratch baseline?*

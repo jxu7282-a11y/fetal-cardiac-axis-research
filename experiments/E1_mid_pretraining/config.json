@@ -164,6 +164,7 @@
     "fold_directory": "local/mid_pretraining/results_nnunet/Dataset503_MidPregnancyCardiac/nnUNetTrainer_300Epochs__nnUNetPlansFrom501__2d/fold_all",
     "training_config": "local/mid_pretraining/experiment_config.json",
     "training_summary": "local/mid_pretraining/results/training_summary.md",
+    "data_audit": "local/mid_pretraining/data_audit/mid_data_audit.md",
     "aggregate_validation": "local/mid_pretraining/results/fold_all_same_data_validation_summary.json",
     "case_manifest": "local/mid_pretraining/data_audit/mid_case_manifest.csv",
     "note": "All paths above remain local and ignored by Git."

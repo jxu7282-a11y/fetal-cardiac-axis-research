@@ -37,7 +37,7 @@ started as part of this archive task.
 The source contained 905 RGB PNG images, 905 single-channel PNG masks, and 905
 annotation-info JSON files. Images, masks, and annotation files matched by reliable case
 stem in 905/905 cases. In the retained set, image and mask dimensions matched in 890/890
-cases. No empty masks or corrupt files were found.
+cases. No empty masks or corrupt files were found. PNG images and masks carry no DICOM/affine spatial metadata, so orientation checks were limited to size, decoding, and same-source consistency; no rotation, flip, or non-isotropic scaling was applied.
 
 Exact image-file SHA256 identified **15 duplicate groups, each containing 2 files**
 (30 files total). One case per group was retained using the deterministic rule
@@ -50,6 +50,8 @@ to 46,473 (3.9%–12.7% of the image) across the 15 groups. The retained case ke
 image, mask, and annotation file. No masks were merged, substituted, or selected by Dice
 or area. This rule is deterministic; it does not establish which annotation is clinically
 more correct.
+
+Additional audit note: `roi_box` (all 905 cases) and at least one `landmark` (98/905 cases) fall outside the image bounds; this coordinate anomaly was recorded but not used for training, cropping, or mask rewriting.
 
 | Count | Value |
 |---|---:|
@@ -94,7 +96,9 @@ nnUNetv2_move_plans_between_datasets \
 This produced `nnUNetPlansFrom501`; the E0 plans file was not edited. Image channels
 (3), patch size (768 x 768), batch size (5), and the 8-stage `PlainConvUNet` topology all
 match E0. Mid-trimester intensity statistics were recomputed rather than inherited from
-E0, and the data were preprocessed with those statistics.
+E0, and the data were preprocessed with those statistics. In preprocessed arrays, a `-1` value outside the non-zero cropping box is nnU-Net's ignore value, not an extra source-mask class.
+
+The prepared dataset `Dataset503_MidPregnancyCardiac` has `imagesTr` 890, `labelsTr` 890, and `dataset.json` `numTraining=890`. It uses the 2D configuration with the `NaturalImage2DIO` reader/writer, 3-channel RGB inputs and single-channel PNG labels. The official `verify_dataset_integrity` check passed; after re-preprocessing, 890/890 image, segmentation, and `.pkl` files exist, and cropped-region masks are pixel-identical to the source masks.
 
 | Compatibility check | Result |
 |---|---|
@@ -117,7 +121,7 @@ semantics are shared merely because IDs coincide.
 
 The run completed **300/300 epochs** and exited normally. The mean epoch duration was
 33.71 seconds; the sum of the 300 epoch timers was 2.81 hours. The final epoch recorded
-train loss -0.9127 and validation loss -0.9386.
+train loss -0.9127 and validation loss -0.9386; the best same-data monitoring validation loss was -0.9387. `checkpoint_final.pth` was saved on `on_train_end`; the periodic `checkpoint_latest.pth` (written every 50 epochs) is auto-removed after the final save, so only `final` and `best` checkpoints remain.
 
 `fold=all` in nnU-Net sets the training and validation key lists to the same full
 collection of 890 cases. It is therefore an **in-sample monitoring pass**, not an
