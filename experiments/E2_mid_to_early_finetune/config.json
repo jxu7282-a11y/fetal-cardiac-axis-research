@@ -1,0 +1,95 @@
+{
+  "experiment_id": "E2",
+  "name": "E2 mid-trimester pretraining -> early-trimester fine-tuning",
+  "archived_at": "2026-11-25T14:30:00+08:00",
+  "hypothesis": "Initializing an early-trimester nnUNetv2 model from a mid-trimester pretrained checkpoint improves early-trimester cardiac-axis measurement (Full Angle) versus the E0 from-scratch baseline.",
+  "baseline_comparison": "E0 early-trimester nnUNetv2 2D baseline (from scratch), same data, folds, GT, and geometry.",
+  "target_dataset": {
+    "task": "Dataset501_EarlyRetroCardiac",
+    "modality": "2D fetal cardiac ultrasound (early trimester)",
+    "image_channels": 3,
+    "label_ids": {
+      "0": "background",
+      "1": "reference_center_1",
+      "2": "label_2 (not used by geometry)",
+      "3": "label_3 (not used by geometry)",
+      "4": "cardiac_region_4",
+      "5": "cardiac_region_5",
+      "6": "thorax_reference_6"
+    },
+    "num_training": 621,
+    "cohorts": {
+      "retrospective": {"total": 621, "Ne": 571, "Po": 50, "role": "5-fold development / OOF"},
+      "multicenter": {"total": 442, "Ne": 434, "Po": 8, "role": "external test"},
+      "prospective": {"total": 411, "Ne": 400, "Po": 11, "role": "prospective test"}
+    }
+  },
+  "pretrained_init": {
+    "source": "mid-trimester pretraining checkpoint_final.pth (server-side, not in Git)",
+    "sha256": "df94a1d9aac1557a50d63856d684ef236508b45731dbcfd3479c85493314cd9f",
+    "loader": "nnunetv2.run.load_pretrained_weights.load_pretrained_weights (-pretrained_weights)",
+    "non_segmentation_keys_transferred": 382,
+    "segmentation_keys_skipped_reinitialized": 14,
+    "optimizer_or_epoch_state_restored": false,
+    "all_folds_initialized_from_same_checkpoint": true,
+    "loading_audit_status": "PASS (see pretrained_loading_audit.md)"
+  },
+  "training": {
+    "nnunetv2": "2.8.1",
+    "configuration": "2d",
+    "trainer": "nnUNetTrainer_300Epochs",
+    "plans": "nnUNetPlans",
+    "epochs": 300,
+    "folds": [0, 1, 2, 3, 4],
+    "fold_source": "E0 original five-fold split (not regenerated)",
+    "physical_gpu": 3,
+    "init_rule": "every fold independently initialized from the same mid checkpoint; fold 0-4 all completed 300 epochs"
+  },
+  "evaluation": {
+    "ground_truth": "frozen E0 fixed gold-assisted manual GT (label_gold + TAR manual lines, angle domain only)",
+    "data_reading_spec": "CARDIAC_AXIS_DATA_READING_SPEC_v1.0",
+    "geometry_pipeline": "fixed E0 geometry: ID4/ID5 OBB weighted card axis; ID6->ID1 centroid reference axis",
+    "internal_protocol": "five-fold OOF; each fold predicts its own validation set",
+    "external_protocol": "5-fold ensemble of checkpoint_best.pth over external images; TTA disabled",
+    "checkpoint_for_inference": "checkpoint_best.pth",
+    "tta": false,
+    "segmentation_metrics": ["Dice", "IoU", "HD95"],
+    "angle_metrics": ["Full Angle MAE", "MedAE", "P90", "P95", "Card Axis Error", "Reference Axis Error", "measurement failure rate"],
+    "stratification": ["Ne", "Po"],
+    "paired_bootstrap": {"n_resamples": 5000, "seed": 42, "ci": "95% percentile", "paired_by": "case (local only; no identifiers archived)"},
+    "measurement_failures": "0 / 1474"
+  },
+  "headline_metrics": {
+    "note": "delta = E2 - E0; Full Angle / P95 are the primary criteria, Dice is not.",
+    "internal_5fold": {"n": 621, "E2_dice": 0.9337, "E0_dice": 0.9354, "E2_full_mae": 3.607, "E0_full_mae": 3.639, "delta_mae": -0.031, "delta_mae_ci": [-0.170, 0.111], "E2_full_p95": 9.460, "E0_full_p95": 9.924, "delta_p95": -0.464},
+    "multicenter": {"n": 442, "E2_dice": 0.9247, "E0_dice": 0.9267, "E2_full_mae": 4.317, "E0_full_mae": 4.088, "delta_mae": 0.229},
+    "prospective": {"n": 411, "E2_dice": 0.9304, "E0_dice": 0.9325, "E2_full_mae": 3.368, "E0_full_mae": 3.365, "delta_mae": 0.004},
+    "external_total": {"n": 853, "E2_dice": 0.9275, "E0_dice": 0.9295, "E2_full_mae": 3.860, "E0_full_mae": 3.739, "delta_mae": 0.120, "delta_mae_ci": [-0.082, 0.356], "E2_full_p95": 9.506, "E0_full_p95": 9.351, "delta_p95": 0.155}
+  },
+  "geometry_decomposition_summary": {
+    "note": "delta = E2 - E0; negative = E2 better. E2 improves Card axis but harms Reference axis.",
+    "all_1474": {"delta_card": -0.107, "delta_ref": 0.173, "delta_full": 0.056},
+    "internal_621": {"delta_card": 0.024, "delta_ref": -0.117, "delta_full": -0.031},
+    "external_853": {"delta_card": -0.202, "delta_ref": 0.384, "delta_full": 0.120},
+    "hard_E0ge10_64": {"delta_card": -1.082, "delta_ref": -0.517, "delta_full": -1.993, "n_improved_sign": 46},
+    "severe_negative_transfer_5": {"delta_card": -1.117, "delta_ref": 36.533, "delta_full": 36.186},
+    "finding": "Cardiac axis (E2) improved overall, Reference axis worsened; severe negative transfer is a Reference-axis (ID6 centroid / largest-component) failure, not a cardiac-axis or geometry-definition failure."
+  },
+  "integrity": {
+    "checkpoint_final_sha256": "df94a1d9aac1557a50d63856d684ef236508b45731dbcfd3479c85493314cd9f",
+    "weights_in_git": false,
+    "predictions_in_git": false,
+    "case_level_data_in_git": false,
+    "e0_artifacts_modified": false,
+    "gt_or_postprocessing_modified": false
+  },
+  "publication": {
+    "aggregate_only": true,
+    "weights_published": false,
+    "images_published": false,
+    "masks_published": false,
+    "case_manifest_published": false,
+    "case_level_csv_published": false,
+    "prediction_png_published": false
+  }
+}
