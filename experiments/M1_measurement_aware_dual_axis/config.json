@@ -1,0 +1,138 @@
+{
+  "experiment_id": "M1",
+  "name": "M1 Measurement-aware Segmentation with Dual-axis Auxiliary Supervision",
+  "version": "m1-dual-axis-v1.0",
+  "archived_at": "2026-11-26",
+  "position_in_project": "Independent method experiment parallel to E3. Tests whether measurement-aware auxiliary supervision (two double-angle axis heads on the final decoder feature) improves early-trimester cardiac-axis measurement over E0 scratch. Scratch init: no mid-trimester data, no pretrained weights. Not a transfer experiment.",
+  "hypothesis": "Adding lightweight Card/Reference double-angle regression heads on the final decoder feature, trained jointly with the E0 segmentation loss (L = L_seg + 0.1*(L_card+L_ref)/2), improves Full Angle measurement versus the E0 from-scratch baseline, without changing the segmentation/inference pipeline.",
+
+  "target_dataset": {
+    "task": "Dataset501_EarlyRetroCardiac",
+    "configuration": "2d",
+    "plans": "nnUNetPlans (E0 originals, not regenerated)",
+    "modality": "2D fetal cardiac ultrasound (early trimester)",
+    "input_channels": 3,
+    "network": "dynamic_network_architectures.architectures.unet.PlainConvUNet",
+    "label_ids": {
+      "0": "background",
+      "1": "reference_center_1",
+      "2": "label_2",
+      "3": "label_3",
+      "4": "cardiac_region_4",
+      "5": "cardiac_region_5",
+      "6": "thorax_reference_6"
+    },
+    "num_training": 621,
+    "cohorts": {
+      "retrospective": {"total": 621, "Ne": 571, "Po": 50, "role": "five-fold development / OOF"},
+      "multicenter": {"total": 442, "Ne": 434, "Po": 8, "role": "external test"},
+      "prospective": {"total": 411, "Ne": 400, "Po": 11, "role": "prospective test"}
+    },
+    "splits": "local/nnunet_preprocessed/Dataset501_EarlyRetroCardiac/splits_final.json (E0 original five-fold, not regenerated)"
+  },
+
+  "network_architecture": {
+    "backbone": "E0 PlainConvUNet unchanged (encoder + decoder + 7-channel segmentation output + deep supervision)",
+    "inference_path": "network(x) returns ONLY the original segmentation logits; auxiliary heads are ignored at inference, post-processing and geometry unchanged",
+    "aux_heads": {
+      "module": "DualAxisAuxHeads",
+      "per_head": "AdaptiveAvgPool2d(1) -> Flatten -> Linear(C_dec, 2)",
+      "num_heads": 2,
+      "head_names": ["card", "ref"],
+      "input_feature": "final decoder stage feature (same tensor that feeds seg_layers[-1])",
+      "input_channels": 32,
+      "output_per_head": "[B, 2] unnormalised double-angle vector [cos 2theta, sin 2theta]",
+      "aux_params_per_head": "2x32 + 2 = 66 (total 132 aux params)",
+      "init": "independent random init; original segmentation head init identical to E0 (aux heads do not perturb E0 parameter init)"
+    },
+    "segmentation_output_unchanged": true,
+    "deep_supervision_unchanged": true
+  },
+
+  "loss": {
+    "segmentation": "E0 inherited (CompoundLoss: Dice + CE, with deep supervision) - unchanged",
+    "axis": "L_axis = 1 - dot(q_pred_normalised, q_gt); double-angle q(theta) = [cos 2theta, sin 2theta]",
+    "auxiliary": "L_aux = (L_card + L_ref) / 2, each averaged over its own valid samples",
+    "total": "L_total = L_seg + 0.1 * L_aux",
+    "aux_weight": 0.1,
+    "invalid_label_handling": "a missing/NaN axis label only masks that axis's auxiliary loss; the case is NOT dropped from segmentation training; batches with no valid aux labels contribute zero aux loss (no NaN)"
+  },
+
+  "training": {
+    "nnunet_version": "2.8.1",
+    "torch_version": "2.7.1+cu118",
+    "trainer": "nnUNetTrainer_M1DualAxis",
+    "trainer_parent": "nnUNetTrainer_300Epochs (E0 trainer), unchanged except aux heads + M1DataLoader + train_step aux term",
+    "configuration": "2d",
+    "epochs": 300,
+    "folds": [0, 1, 2, 3, 4],
+    "fold_source": "E0 original five-fold split (not regenerated)",
+    "init": "scratch from epoch 0 (no mid-trimester data, no pretrained weights)",
+    "optimizer": "inherited E0 default (SGD, momentum 0.99, nesterov)",
+    "learning_rate": "inherited E0 default (0.01, PolyLR over 300 epochs)",
+    "batch_size": 5,
+    "patch_size": [768, 768],
+    "augmentation": "inherited E0 default nnUNetv2 2D (rotation, mirroring, scaling, gamma; no elastic). Orientation labels transformed with the actual SpatialTransform/MirrorTransform parameters via M1DataLoader + dual_axis_augmentation.",
+    "preprocessing": "inherited E0 default (ZScoreNormalization, nnUNetPlans_2d)",
+    "physical_gpu": 1,
+    "cuda_visible_devices": "1",
+    "gpu_note": "GPU 3 reserved for E3; M1 trained on physical GPU 1",
+    "results_root": "local/m1_measurement_aware/results_nnunet/Dataset501_EarlyRetroCardiac/nnUNetTrainer_M1DualAxis__nnUNetPlans__2d",
+    "logs_root": "local/m1_measurement_aware/logs"
+  },
+
+  "evaluation": {
+    "status": "complete",
+    "ground_truth": "local/phase0/fixed_gt_v1.csv (frozen E0 GT, unchanged)",
+    "data_reading_spec": "CARDIAC_AXIS_DATA_READING_SPEC_v1.0",
+    "geometry_pipeline": "frozen E0 geometry (ID4/ID5 OBB weighted card axis; ID6->ID1 centroid reference axis)",
+    "internal_protocol": "five-fold OOF; each fold predicts its own validation set (621)",
+    "external_protocol": "5-fold ensemble of checkpoint_best.pth over imagesTs (853); --disable_tta",
+    "checkpoint_for_inference": "checkpoint_best.pth",
+    "tta": false,
+    "segmentation_metrics": ["Dice", "IoU", "HD95"],
+    "angle_metrics": ["Full Angle MAE", "MedAE", "P90", "P95", "Card Axis Error", "Reference Axis Error", "measurement failure rate"],
+    "stratification_internal": ["Ne", "Po"],
+    "stratification_external": ["multicenter", "prospective"],
+    "paired_bootstrap": {"n_resamples": 10000, "seed": 42, "ci": "95% percentile", "paired_by": "case uid (local only)"},
+    "measurement_failures": "1 internal (ref_axis_unavailable); same case also fails under E3; E0/E2 valid",
+    "n_valid_full": {"internal": 620, "external": 853},
+    "comparators": ["E0 (scratch, primary)", "E2 (full-network transfer)", "E3 (encoder-only transfer)"]
+  },
+
+  "results": {
+    "internal_oof": {"n_cases": 621, "n_full_error": 620, "full_MAE": 3.8147, "full_MedAE": 2.8065, "full_P90": 8.1316, "full_P95": 10.0838, "full_ge10_pct": 5.161, "card_MAE": 3.1353, "ref_MAE": 2.5296, "dice_mean": 0.9329, "iou_mean": 0.8873},
+    "external_all": {"n_cases": 853, "full_MAE": 3.6917, "full_MedAE": 3.0393, "full_P90": 7.7068, "full_P95": 9.3687, "full_ge10_pct": 3.517, "card_MAE": 2.8298, "ref_MAE": 2.7474, "dice_mean": 0.9289, "iou_mean": 0.8769},
+    "external_by_cohort": {
+      "multicenter": {"n_cases": 442, "full_MAE": 4.0124, "full_P95": 10.1673, "dice_mean": 0.9258},
+      "prospective": {"n_cases": 411, "full_MAE": 3.3467, "full_P95": 8.1840, "dice_mean": 0.9322}
+    }
+  },
+
+  "headline_verdict": "Neutral / no demonstrated clinical gain. Internal Full Angle is significantly WORSE than E0 (+0.181 deg, 95% CI [0.023, 0.359]) and E3 (+0.168 deg, [0.009, 0.337]); external is statistically null versus E0 (-0.048 deg) and E3 (-0.001 deg). The auxiliary heads collapsed to a near-constant (mean-direction) predictor; see README/report for the GAP diagnosis.",
+
+  "diagnosis": {
+    "aux_loss_vs_constant_baseline": {
+      "note": "Constant-predictor baseline = 1 - |E[e^{i 2 theta}]| on each fold's training set (no image read). Cosine loss range is [0,2].",
+      "per_fold": {
+        "0": {"const_baseline_mean": 0.669, "observed_aux_loss": 0.727, "excess": 0.058},
+        "1": {"const_baseline_mean": 0.684, "observed_aux_loss": 0.745, "excess": 0.061},
+        "2": {"const_baseline_mean": 0.672, "observed_aux_loss": 0.731, "excess": 0.059},
+        "3": {"const_baseline_mean": 0.672, "observed_aux_loss": 0.743, "excess": 0.071},
+        "4": {"const_baseline_mean": 0.673, "observed_aux_loss": 0.736, "excess": 0.063}
+      },
+      "interpretation": "After 300 epochs the auxiliary loss is only ~0.06 below a no-image constant predictor (L=0.73 ~ 37 deg axis error, chance ~45 deg)."
+    },
+    "aux_bias_direction_deg": {
+      "note": "Normalised direction of each fold's aux_heads.*.fc.bias = the network's default output axis angle. Label marginal means: Card 90.0 deg, Ref 87.3 deg.",
+      "fold_0": {"card": 89, "ref": 87},
+      "fold_1": {"card": 88, "ref": 96},
+      "fold_2": {"card": 94, "ref": 87},
+      "fold_3": {"card": 92, "ref": 89},
+      "fold_4": {"card": 93, "ref": 87}
+    },
+    "root_cause": "AdaptiveAvgPool2d(1) collapses the [B,32,H,W] decoder feature to a 32-d global vector, discarding the spatial layout that defines an axis direction. Both heads therefore reduce to a near-constant mean-direction predictor. The 0.1x aux gradient still back-propagates into the shared decoder, acting as a direction-agnostic (≈90 deg prior) regulariser rather than useful axis supervision."
+  },
+
+  "archived_case_level_policy": "Case-level CSVs (with real uids) stay in local/. Only anonymous aggregate CSVs and a hashed failure record (sha256[:16], scheme documented) are archived. No weights, prediction masks, TAR, or training logs are uploaded."
+}

@@ -1,0 +1,2 @@
+case_hash,scope,model,cohort,class,valid_pred,pred_card_reason,pred_ref_reason,card_error,ref_error,full_error,failure_reasons
+7ef4322c2840bfc2,int,M1,retrospective,Ne,True,id4_id5_weighted,missing_id1_or_id6,3.935900296208956,,,ref_axis_unavailable;full_angle_unavailable
