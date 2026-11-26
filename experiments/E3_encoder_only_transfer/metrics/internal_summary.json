@@ -1,0 +1,42 @@
+{
+  "per_fold_pred_count": {
+    "0": 125,
+    "1": 124,
+    "2": 124,
+    "3": 124,
+    "4": 124
+  },
+  "overall": {
+    "cohort": "ALL",
+    "N_cases": 621,
+    "N_valid_pred": 621,
+    "card_error_N": 621,
+    "card_error_mean": 3.187946174298706,
+    "card_error_median": 2.297561070814865,
+    "card_error_p90": 5.967564886615776,
+    "card_error_p95": 8.253821635151397,
+    "ref_error_N": 620,
+    "ref_error_mean": 2.4037799142690854,
+    "ref_error_median": 1.9000313815044905,
+    "ref_error_p90": 4.806400399181105,
+    "ref_error_p95": 5.699626948777829,
+    "full_error_N": 620,
+    "full_error_mean": 3.647207549194399,
+    "full_error_median": 2.806388412005205,
+    "full_error_p90": 7.176148057239714,
+    "full_error_p95": 9.173118982688342,
+    "dice_mean_present_N": 621,
+    "dice_mean_present_mean": 0.9338772519800818,
+    "iou_mean_present_N": 621,
+    "iou_mean_present_mean": 0.8882124737976951
+  },
+  "hd95_mean": 10.551130036973005,
+  "hd95_by_label": {
+    "id1": 11.191652379718791,
+    "id2": 21.839184135245894,
+    "id3": 15.878744091206872,
+    "id4": 3.0322350148159583,
+    "id5": 3.2438853635724256,
+    "id6": 8.07052705449113
+  }
+}

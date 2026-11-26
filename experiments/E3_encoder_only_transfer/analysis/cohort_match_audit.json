@@ -1,0 +1,149 @@
+{
+  "internal": {
+    "n_E0": 621,
+    "n_E2": 621,
+    "n_E3": 621,
+    "uid_sets_identical": true,
+    "duplicate_uid": {
+      "E0": 0,
+      "E2": 0,
+      "E3": 0
+    },
+    "gt_identical": {
+      "manual_full_angle": {
+        "E0==E2": true,
+        "E0==E3": true
+      },
+      "manual_card_axis": {
+        "E0==E2": true,
+        "E0==E3": true
+      },
+      "manual_ref_axis": {
+        "E0==E2": true,
+        "E0==E3": true
+      }
+    },
+    "invalid_pred": {
+      "E0": 0,
+      "E2": 0,
+      "E3": 0
+    },
+    "nan_error_counts": {
+      "E0": {
+        "full_error": 0,
+        "card_error": 0,
+        "ref_error": 0
+      },
+      "E2": {
+        "full_error": 0,
+        "card_error": 0,
+        "ref_error": 0
+      },
+      "E3": {
+        "full_error": 1,
+        "card_error": 0,
+        "ref_error": 1
+      }
+    },
+    "cohort_counts": {
+      "E0": {
+        "retrospective": 621
+      },
+      "E2": {
+        "retrospective": 621
+      },
+      "E3": {
+        "retrospective": 621
+      }
+    },
+    "class_counts": {
+      "E0": {
+        "Ne": 571,
+        "Po": 50
+      },
+      "E2": {
+        "Ne": 571,
+        "Po": 50
+      },
+      "E3": {
+        "Ne": 571,
+        "Po": 50
+      }
+    }
+  },
+  "external": {
+    "n_E0": 853,
+    "n_E2": 853,
+    "n_E3": 853,
+    "uid_sets_identical": true,
+    "duplicate_uid": {
+      "E0": 0,
+      "E2": 0,
+      "E3": 0
+    },
+    "gt_identical": {
+      "manual_full_angle": {
+        "E0==E2": true,
+        "E0==E3": true
+      },
+      "manual_card_axis": {
+        "E0==E2": true,
+        "E0==E3": true
+      },
+      "manual_ref_axis": {
+        "E0==E2": true,
+        "E0==E3": true
+      }
+    },
+    "invalid_pred": {
+      "E0": 0,
+      "E2": 0,
+      "E3": 0
+    },
+    "nan_error_counts": {
+      "E0": {
+        "full_error": 0,
+        "card_error": 0,
+        "ref_error": 0
+      },
+      "E2": {
+        "full_error": 0,
+        "card_error": 0,
+        "ref_error": 0
+      },
+      "E3": {
+        "full_error": 0,
+        "card_error": 0,
+        "ref_error": 0
+      }
+    },
+    "cohort_counts": {
+      "E0": {
+        "multicenter": 442,
+        "prospective": 411
+      },
+      "E2": {
+        "multicenter": 442,
+        "prospective": 411
+      },
+      "E3": {
+        "multicenter": 442,
+        "prospective": 411
+      }
+    },
+    "class_counts": {
+      "E0": {
+        "Ne": 834,
+        "Po": 19
+      },
+      "E2": {
+        "Ne": 834,
+        "Po": 19
+      },
+      "E3": {
+        "Ne": 834,
+        "Po": 19
+      }
+    }
+  }
+}

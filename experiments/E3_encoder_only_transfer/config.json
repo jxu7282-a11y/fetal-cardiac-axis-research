@@ -1,0 +1,177 @@
+{
+  "experiment_id": "E3",
+  "name": "E3 mid-trimester ENCODER-only pretraining -> early-trimester fine-tuning",
+  "generated_at": "2026-11-25",
+  "initialisation": {
+    "source_checkpoint": "local/mid_pretraining/results/checkpoint_final.pth",
+    "source_checkpoint_sha256": "df94a1d9aac1557a50d63856d684ef236508b45731dbcfd3479c85493314cd9f",
+    "source_checkpoint_current_epoch": 300,
+    "source_checkpoint_trainer": "nnUNetTrainer_300Epochs",
+    "load_policy": "encoder parameters only, copied in place into the freshly built network",
+    "encoder_state_dict_entries_loaded": 256,
+    "encoder_unique_parameter_objects_loaded": 64,
+    "encoder_tensor_count": 18881184,
+    "decoder": "fresh random initialisation (incl. decoder.transpconvs ConvTranspose2d)",
+    "segmentation_heads": "fresh random initialisation (7 heads x 2 tensors = 14)",
+    "decoder_and_seg_state_dict_entries_reinitialised": 140,
+    "E2_or_E0_weights_used": false,
+    "optimizer_or_epoch_state_restored": false,
+    "folds_independent": true,
+    "encoder_frozen": false,
+    "official_loader_used": false,
+    "official_loader_rejection_reason": "nnunetv2.load_pretrained_weights asserts that every non-'.seg_layers.' key must exist in the checkpoint; an encoder-only state dict is therefore rejected",
+    "custom_loader": "src/nnunet_ext/nnUNetTrainer_E3EncoderOnly.py::transfer_encoder_weights"
+  },
+  "target_dataset": {
+    "task": "Dataset501_EarlyRetroCardiac",
+    "configuration": "2d",
+    "plans": "nnUNetPlans",
+    "plans_file": "local/nnunet_preprocessed/Dataset501_EarlyRetroCardiac/nnUNetPlans.json",
+    "patch_size": [
+      768,
+      768
+    ],
+    "batch_size": 5,
+    "network": "dynamic_network_architectures.architectures.unet.PlainConvUNet",
+    "network_parameters": 46335249,
+    "input_channels": 3,
+    "segmentation_heads": 7,
+    "label_ids": {
+      "0": "background",
+      "1": "reference_center_1",
+      "2": "label_2",
+      "3": "label_3",
+      "4": "cardiac_region_4",
+      "5": "cardiac_region_5",
+      "6": "thorax_reference_6"
+    },
+    "num_training": 621,
+    "splits": "local/nnunet_preprocessed/Dataset501_EarlyRetroCardiac/splits_final.json (E0 original five-fold, not regenerated)"
+  },
+  "training": {
+    "nnunet_version": "2.8.1",
+    "torch_version": "2.7.1+cu118",
+    "trainer": "nnUNetTrainer_E3EncoderOnly",
+    "trainer_parent": "nnUNetTrainer (stock), identical to nnUNetTrainer_300Epochs except the encoder initialisation",
+    "epochs": 300,
+    "folds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "scratch_from_epoch_zero": true,
+    "continue_training": false,
+    "loss": "inherited default (CompoundLoss, deep supervision)",
+    "optimizer": "inherited default (SGD, momentum 0.99, nesterov)",
+    "learning_rate": "inherited default (0.01, PolyLRScheduler over 300 epochs)",
+    "augmentation": "inherited default",
+    "preprocessing": "inherited default (ZScoreNormalization, nnUNetPlans_2d)",
+    "physical_gpu": 3,
+    "cuda_visible_devices": "3",
+    "gpu_sharing": "shared with other users, no interference",
+    "results_root": "local/e3_encoder_only_transfer/results_nnunet/Dataset501_EarlyRetroCardiac/nnUNetTrainer_E3EncoderOnly__nnUNetPlans__2d",
+    "logs_root": "local/e3_encoder_only_transfer/logs",
+    "checkpoint_sha256_root": "local/e3_encoder_only_transfer/checkpoints_sha256"
+  },
+  "evaluation": {
+    "status": "complete",
+    "ground_truth": "local/phase0/fixed_gt_v1.csv (frozen E0 GT, unchanged)",
+    "folds_source": "local/phase0/fold_v2.csv (E0 original five-fold, not regenerated)",
+    "data_reading_spec": "CARDIAC_AXIS_DATA_READING_SPEC_v1.0",
+    "geometry_pipeline": "src/cardiac_axis/evaluate.py (frozen E0 geometry; ID4/ID5 OBB weighted card axis, ID6->ID1 centroid reference axis)",
+    "internal_predictions": "E3 results_nnunet fold_{0..4}/validation, OOF over 621",
+    "external_predictions": "5-fold ensemble of checkpoint_best.pth over imagesTs (853), --disable_tta",
+    "checkpoint_for_inference": "checkpoint_best.pth",
+    "tta": false,
+    "segmentation_metrics": [
+      "Dice",
+      "IoU",
+      "HD95"
+    ],
+    "angle_metrics": [
+      "Full Angle MAE",
+      "MedAE",
+      "P90",
+      "P95",
+      "Card Error",
+      "Reference Error",
+      "measurement failure rate"
+    ],
+    "stratification_internal": [
+      "Ne",
+      "Po"
+    ],
+    "stratification_external": [
+      "multicenter",
+      "prospective"
+    ],
+    "paired_bootstrap": {
+      "n_resamples": 10000,
+      "seed": 42,
+      "ci": "95% percentile",
+      "paired_by": "case uid"
+    },
+    "measurement_failures": 1,
+    "measurement_failure_note": "one internal case lost all ID1 pixels; reference axis and full angle undefined (recorded, not dropped)",
+    "archive_note": "case-level CSVs are archived with case_hash only; original uids stay in local/"
+  },
+  "environment_variables_required": {
+    "nnUNet_raw": "$PWD/local/nnunet_raw",
+    "nnUNet_preprocessed": "$PWD/local/nnunet_preprocessed",
+    "nnUNet_results": "$PWD/local/e3_encoder_only_transfer/results_nnunet",
+    "nnUNet_extTrainer": "$PWD/src/nnunet_ext",
+    "E3_MID_CHECKPOINT": "$PWD/local/mid_pretraining/results/checkpoint_final.pth",
+    "E3_AUDIT_DIR": "$PWD/local/e3_encoder_only_transfer",
+    "MPLCONFIGDIR": "$PWD/local/mplcache",
+    "CUDA_VISIBLE_DEVICES": "3"
+  },
+  "verification_artifacts": {
+    "cpu_transfer_check": "local/e3_encoder_only_transfer/encoder_transfer_cpu_check.json",
+    "gpu_smoke": "local/e3_encoder_only_transfer/smoke (1 shortened epoch, checkpoints, debug.json, audit copy)",
+    "per_fold_audit": "local/e3_encoder_only_transfer/encoder_load_fold_{0..4}.json"
+  },
+  "archived_at": "2026-11-26T10:00:00+08:00",
+  "hypothesis": "Initialising the early-trimester nnUNetv2 encoder from mid-trimester pretraining, while reinitialising the decoder and segmentation heads, improves early-trimester cardiac-axis measurement versus the E0 from-scratch baseline and the E2 full-network-transfer baseline.",
+  "baseline_comparison": "E0 (scratch) and E2 (full non-segmentation transfer); same data, folds, GT, geometry.",
+  "results": {
+    "internal_oof": {
+      "n_cases": 621,
+      "n_full_error": 620,
+      "full_MAE": 3.6472,
+      "full_MedAE": 2.8064,
+      "full_P90": 7.1761,
+      "full_P95": 9.1731,
+      "card_MAE": 3.1879,
+      "ref_MAE": 2.4038,
+      "dice_mean": 0.9339,
+      "iou_mean": 0.8882,
+      "hd95_mean": 10.5511
+    },
+    "external_all": {
+      "n_cases": 853,
+      "full_MAE": 3.6929,
+      "full_MedAE": 3.004,
+      "full_P90": 7.3421,
+      "full_P95": 8.8475,
+      "card_MAE": 2.7681,
+      "ref_MAE": 2.9224,
+      "dice_mean": 0.9282,
+      "iou_mean": 0.8746,
+      "hd95_mean": 16.7991
+    },
+    "external_by_cohort": {
+      "multicenter": {
+        "n_cases": 442,
+        "full_MAE": 4.03,
+        "dice_mean": 0.9262
+      },
+      "prospective": {
+        "n_cases": 411,
+        "full_MAE": 3.3304,
+        "dice_mean": 0.9303
+      }
+    }
+  }
+}
