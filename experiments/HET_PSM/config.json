@@ -1,0 +1,113 @@
+{
+  "experiment_id": "HET-PSM",
+  "stage": "complete_trained_evaluated_archived",
+  "archived_at": "2026-11-28T02:10:00+08:00",
+  "hypothesis": "中孕期加入左右侧成员（side membership）辅助监督的层次预训练（HET-PSM），其 encoder 迁移到早孕期后，能否在 Full Angle 测量上优于 E0（scratch）与 E3（纯 encoder 迁移、无 side 监督）？",
+  "mid_trimester": {
+    "name": "B1 mid-trimester pretraining with side membership head",
+    "task": "Dataset503_MidPregnancyCardiac",
+    "configuration": "2d",
+    "plans": "nnUNetPlansFrom501",
+    "trainer": "nnUNetTrainer_HETPSMMid",
+    "network": "experiments.HET_PSM.het_psm_unet.HETPSMPlainConvUNet",
+    "network_base": "dynamic_network_architectures.architectures.unet.PlainConvUNet",
+    "classes": 10,
+    "epochs": 300,
+    "batch_size": 5,
+    "patch_size": [768, 768],
+    "fold": "all",
+    "side_head": {
+      "input": "final decoder feature (last decoder stage output)",
+      "conv": "1x1 Conv2d",
+      "in_channels_observed": 32,
+      "out_channels": 2,
+      "channels": ["left", "right"],
+      "parameters": 66,
+      "output_resolution": "full-resolution segmentation logits"
+    },
+    "loss": {
+      "total": "L_seg + 0.1 * L_side",
+      "seg_loss": "nnUNet default DC+CE with deep supervision (unchanged)",
+      "side_loss": "MaskedBCEWithLogits, per-case mean then mean over valid cases",
+      "side_weight": 0.1,
+      "targets": {"1,2": "left=1", "3,4": "right=1", "other_ids": "ignored (incl. 5-9)"}
+    },
+    "status": "DONE",
+    "epochs_completed": 300,
+    "mean_validation_dice": 0.9728252734369577,
+    "checkpoint_final_sha256": "5900ae4166379861b36fef8eec351e5f0aacd07a472fee08bd71292fbebd5b30",
+    "results_root": "local/het_psm/mid_pretraining/results_nnunet/Dataset503_MidPregnancyCardiac/nnUNetTrainer_HETPSMMid__nnUNetPlansFrom501__2d/fold_all",
+    "log": "local/het_psm/mid_pretraining/logs/hetpsm_mid_fold_all.log"
+  },
+  "early_trimester": {
+    "name": "B2 early-trimester five-fold fine-tuning, encoder-only transfer from B1",
+    "task": "Dataset501_EarlyRetroCardiac",
+    "configuration": "2d",
+    "plans": "nnUNetPlans",
+    "trainer": "nnUNetTrainer_HETPSMEarly",
+    "init": "encoder-only transfer from B1 checkpoint_final; decoder + 7 seg heads fresh random",
+    "discarded": ["mid-trimester decoder (10-class)", "mid-trimester side head"],
+    "side_head_in_early_network": false,
+    "early_side_loss": false,
+    "transfer_rule": "E3 encoder_transfer logic (256 state_dict entries / 64 unique tensors); decoder+seg 140 entries untouched, verified by pre/post snapshot",
+    "epochs": 300,
+    "folds": [0, 1, 2, 3, 4],
+    "execution": "serial folds, single GPU 0 (M1.1 on GPU 3 untouched)",
+    "splits": "E0 original five-fold (splits_final.json, not regenerated)",
+    "status": "DONE (5/5 folds, exit 0)",
+    "results_root": "local/het_psm/early_finetune/results_nnunet/Dataset501_EarlyRetroCardiac/nnUNetTrainer_HETPSMEarly__nnUNetPlans__2d",
+    "logs_root": "local/het_psm/early_finetune/logs",
+    "fold_completion": {
+      "0": {"start": "2026-11-27 13:15:45", "end": "2026-11-27 16:14:53", "exit_code": 0},
+      "1": {"start": "2026-11-27 16:14:56", "end": "2026-11-27 19:28:46", "exit_code": 0},
+      "2": {"start": "2026-11-27 19:28:49", "end": "2026-11-27 21:37:28", "exit_code": 0},
+      "3": {"start": "2026-11-27 21:37:30", "end": "2026-11-27 23:26:31", "exit_code": 0},
+      "4": {"start": "2026-11-27 23:26:33", "end": "2026-11-28 01:16:17", "exit_code": 0}
+    }
+  },
+  "evaluation": {
+    "status": "complete",
+    "protocol": "byte-identical to E3; frozen GT/folds/geometry, checkpoint_best, --disable_tta",
+    "ground_truth": "local/phase0/fixed_gt_v1.csv (frozen E0 GT; sha256 ca5edd88...)",
+    "folds_source": "local/phase0/fold_v2.csv (E0 five-fold; sha256 88b29820...)",
+    "plans_file": "local/nnunet_preprocessed/Dataset501_EarlyRetroCardiac/nnUNetPlans.json (sha256 3f494bf3...)",
+    "splits_file": "local/nnunet_preprocessed/Dataset501_EarlyRetroCardiac/splits_final.json (sha256 79fe66d9...)",
+    "geometry_pipeline": "src/cardiac_axis/evaluate.py (frozen E0 geometry)",
+    "internal_predictions": "B2 results_nnunet fold_{0..4}/validation, OOF over 621",
+    "external_predictions": "5-fold ensemble of checkpoint_best.pth over imagesTs (853), --disable_tta",
+    "checkpoint_for_inference": "checkpoint_best.pth",
+    "tta": false,
+    "stratification_internal": ["Ne", "Po"],
+    "stratification_external": ["multicenter", "prospective"],
+    "paired_bootstrap": {"n_resamples": 10000, "seed": 42, "ci": "95% percentile", "paired_by": "case uid"},
+    "measurement_failures": {"internal": 1, "external": 0},
+    "measurement_failure_note": "internal 1 case lost ID1 pixels -> reference axis and full angle undefined; recorded not dropped (E3 and HET both). Valid paired: internal 620, external 853.",
+    "archive_note": "case-level CSVs archived with case_hash (sha256[:16]) only; original uids stay only in local/"
+  },
+  "results": {
+    "internal_oof": {"n_cases": 621, "n_full_error": 620, "full_MAE": 3.6364, "full_MedAE": 2.7553, "full_P90": 7.2983, "full_P95": 9.3782, "card_MAE": 3.1819, "ref_MAE": 2.4400, "dice_mean": 0.9338, "iou_mean": 0.8883, "hd95_mean": 10.7869},
+    "external_all": {"n_cases": 853, "full_MAE": 3.6481, "full_MedAE": 3.0138, "full_P90": 7.1440, "full_P95": 9.2240, "card_MAE": 2.7291, "ref_MAE": 2.9189, "dice_mean": 0.9281, "iou_mean": 0.8746, "hd95_mean": 16.4915},
+    "external_by_cohort": {"multicenter": {"n_cases": 442, "full_MAE": 3.9078, "dice_mean": 0.9260}, "prospective": {"n_cases": 411, "full_MAE": 3.3688, "dice_mean": 0.9303}},
+    "comparison_full_MAE": {"internal": {"E0": 3.6386, "E3": 3.6472, "HET-PSM": 3.6364}, "external": {"E0": 3.7395, "E3": 3.6929, "HET-PSM": 3.6481}},
+    "paired_bootstrap_full_error_ALL": {
+      "internal_HET_vs_E3": {"n_paired": 620, "delta_mean": -0.0108, "ci95": [-0.1957, 0.1702], "significant": false},
+      "internal_HET_vs_E0": {"n_paired": 620, "delta_mean": 0.0025, "ci95": [-0.1450, 0.1503], "significant": false},
+      "external_HET_vs_E3": {"n_paired": 853, "delta_mean": -0.0448, "ci95": [-0.1778, 0.0732], "significant": false},
+      "external_HET_vs_E0": {"n_paired": 853, "delta_mean": -0.0914, "ci95": [-0.2511, 0.0905], "significant": false}
+    },
+    "conclusion": "Full Angle MAE 数值略优于 E0/E3（Internal 3.636、External 3.648），但所有对比的 95% CI 均跨 0，无统计学显著优势；不能宣称临床测量改善。"
+  },
+  "environment_variables_required": {
+    "nnUNet_raw": "$PWD/local/nnunet_raw",
+    "nnUNet_preprocessed": "$PWD/local/nnunet_preprocessed",
+    "nnUNet_extTrainer": "$PWD/experiments",
+    "HETPSM_MID_CHECKPOINT": "$PWD/local/het_psm/mid_pretraining/results_nnunet/Dataset503_MidPregnancyCardiac/nnUNetTrainer_HETPSMMid__nnUNetPlansFrom501__2d/fold_all/checkpoint_final.pth"
+  },
+  "archive_contents": {
+    "report": "experiments/HET_PSM/report.md",
+    "metrics": "experiments/HET_PSM/results/metrics/",
+    "analysis": "experiments/HET_PSM/results/analysis/",
+    "checkpoints_sha256": "experiments/HET_PSM/results/checkpoints_sha256/",
+    "note": "weights, images, masks, predictions and uid-bearing case CSVs stay in local/ only"
+  }
+}

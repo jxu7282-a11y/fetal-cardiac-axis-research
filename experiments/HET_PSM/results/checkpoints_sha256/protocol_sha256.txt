@@ -1,0 +1,5 @@
+# Frozen evaluation protocol hashes (E0 source, unchanged; used by HET-PSM B2)
+3f494bf38c14e3add04a4063817df9dbf8ff369d18acce483513c91d7dc013f0  local/nnunet_preprocessed/Dataset501_EarlyRetroCardiac/nnUNetPlans.json
+79fe66d949ccd3fd389e428796216faa92abaa9eea41d223b60c976c4a607a32  local/nnunet_preprocessed/Dataset501_EarlyRetroCardiac/splits_final.json
+ca5edd8861149220ab601be7d58eeb9a5efa5f052f75b70a1c75fcc9364029f6  local/phase0/fixed_gt_v1.csv
+88b29820a45fd12715d9c911d3c3b93f9d6569c1c837ea11400e59714409d414  local/phase0/fold_v2.csv

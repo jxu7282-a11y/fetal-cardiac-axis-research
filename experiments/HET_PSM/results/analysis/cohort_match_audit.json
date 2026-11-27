@@ -1,0 +1,121 @@
+{
+  "internal": {
+    "n": {
+      "E0": 621,
+      "E3": 621,
+      "HET": 621
+    },
+    "uid_identical": true,
+    "dup": {
+      "E0": 0,
+      "E3": 0,
+      "HET": 0
+    },
+    "nan_full": {
+      "E0": 0,
+      "E3": 1,
+      "HET": 1
+    },
+    "nan_card": {
+      "E0": 0,
+      "E3": 0,
+      "HET": 0
+    },
+    "nan_ref": {
+      "E0": 0,
+      "E3": 1,
+      "HET": 1
+    },
+    "valid_pred": {
+      "E0": 621,
+      "E3": 621,
+      "HET": 621
+    },
+    "cohort": {
+      "E0": {
+        "retrospective": 621
+      },
+      "E3": {
+        "retrospective": 621
+      },
+      "HET": {
+        "retrospective": 621
+      }
+    },
+    "class": {
+      "E0": {
+        "Ne": 571,
+        "Po": 50
+      },
+      "E3": {
+        "Ne": 571,
+        "Po": 50
+      },
+      "HET": {
+        "Ne": 571,
+        "Po": 50
+      }
+    }
+  },
+  "external": {
+    "n": {
+      "E0": 853,
+      "E3": 853,
+      "HET": 853
+    },
+    "uid_identical": true,
+    "dup": {
+      "E0": 0,
+      "E3": 0,
+      "HET": 0
+    },
+    "nan_full": {
+      "E0": 0,
+      "E3": 0,
+      "HET": 0
+    },
+    "nan_card": {
+      "E0": 0,
+      "E3": 0,
+      "HET": 0
+    },
+    "nan_ref": {
+      "E0": 0,
+      "E3": 0,
+      "HET": 0
+    },
+    "valid_pred": {
+      "E0": 853,
+      "E3": 853,
+      "HET": 853
+    },
+    "cohort": {
+      "E0": {
+        "multicenter": 442,
+        "prospective": 411
+      },
+      "E3": {
+        "multicenter": 442,
+        "prospective": 411
+      },
+      "HET": {
+        "multicenter": 442,
+        "prospective": 411
+      }
+    },
+    "class": {
+      "E0": {
+        "Ne": 834,
+        "Po": 19
+      },
+      "E3": {
+        "Ne": 834,
+        "Po": 19
+      },
+      "HET": {
+        "Ne": 834,
+        "Po": 19
+      }
+    }
+  }
+}
