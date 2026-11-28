@@ -2,7 +2,7 @@
 
 **文档版本：** v1.0  
 **整理日期：** 2026-11-23  
-**状态：** E0 早孕期五折训练已完成；中孕期全量预训练已完成；早孕期微调尚未开始
+**状态：** E0 早孕期五折训练已完成；中孕期全量预训练已完成；早孕期微调尚未开始（2026-11-28 更新：早孕/中孕标签语义已确认）
 
 ## 1. 当前研究假设
 
@@ -28,7 +28,7 @@
 目标：先保证所有实验使用相同的数据版本、划分、后处理和评价。
 
 任务： - 核对正式Manifest和Fold； - 处理阳性病例207条路径不匹配； -
-核实跨队列重复ID候选； - 明确早孕期/中孕期标签语义； -
+核实跨队列重复ID候选； - 标签语义已于 2026-11-28 确认（`06_LABEL_SEMANTICS.md`）； -
 固定TAR读取、Gold语义分配和Full Angle计算； - 复核图像与Mask读取； -
 保存版本、哈希、脚本版本和有效N。
 
@@ -143,7 +143,7 @@ Multicenter 442例：外部测试； - Prospective 411例：前瞻测试。
 - 状态：planned（中孕预训练阶段已完成，早孕微调尚未开始）
 - 研究问题：中孕期预训练是否降低早孕期Full Angle误差？
 - 中孕数据清单：905原始 → 890去重训练例；见 `local/mid_pretraining/data_audit/mid_case_manifest.csv`
-- 标签映射：恒等保留 0–9；Label 1–9 解剖语义仍待确认；不得与早孕 1–6 强行对应
+- 标签映射：恒等保留 0–9；Label 1–9 解剖语义**已确认**（见 `docs/project/06_LABEL_SEMANTICS.md`）；仍不得与早孕 1–6 按 ID 数字强行对应（早孕 ID1=胸椎 对应 中孕 ID5=胸椎；早孕 ID6=胸腔 对应 中孕 ID6=胸腔；其余无直接对应）
 - 中孕预训练配置：Dataset503_MidPregnancyCardiac，nnUNetPlansFrom501，2D，fold=all，300 epochs，随机初始化
 - 中孕最终权重：`local/mid_pretraining/results/checkpoint_final.pth`
 - 结果：中孕预训练已完成；早孕微调尚未启动，暂无 E1 迁移效果结论
@@ -155,7 +155,7 @@ Multicenter 442例：外部测试； - Prospective 411例：前瞻测试。
 - 状态：completed
 - 原始/去重/训练例数：905 / 890 / 890
 - 重复组：15组×2文件；排除15例，均保留原始文件并记录于 `mid_dedup_excluded.csv`
-- 标签：0–9，共10类；1–9语义待确认
+- 标签：0–9，共10类；1–9语义已确认（0背景/1左心房/2左心室/3右心房/4右心室/5胸椎/6胸腔/7心内缘/8未知区域（与心轴角测算无关）/9室间隔；见 `docs/project/06_LABEL_SEMANTICS.md`）。预训练时以中性占位标签训练，类别数与权重不受影响
 - 网络：PlainConvUNet，3通道输入，8级，patch 768×768，batch 5
 - Plans：`nnUNetPlansFrom501`（由E0 Dataset501 `nnUNetPlans` 经官方 `nnUNetv2_move_plans_between_datasets` 迁移）
 - Trainer：`nnUNetTrainer_300Epochs`（相对 stock 仅 `num_epochs=300`）

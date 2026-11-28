@@ -10,6 +10,12 @@ ultrasound, used to answer: *how well can a plain nnUNetv2 model support early-t
 cardiac-axis measurement?*
 
 The only change from stock nnUNet is `num_epochs = 300` instead of 1000.
+
+Label semantics for the 7 early-trimester classes (0 background, 1 thoracic vertebra,
+2 left rib, 3 right rib, 4 left heart, 5 right heart, 6 thorax) are user-confirmed and
+recorded in `docs/project/06_LABEL_SEMANTICS.md`. The numeric IDs and any historical
+placeholder names in this archive are unchanged.
+
 Multi-center and prospective cohorts were held out and never used for training,
 model selection, or post-processing tuning.
 

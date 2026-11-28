@@ -15,6 +15,17 @@
       "5": "cardiac_region_5",
       "6": "thorax_reference"
     },
+    "label_semantics_confirmed": {
+      "source": "docs/project/06_LABEL_SEMANTICS.md (user-confirmed 2026-11-28)",
+      "0": "background (\u80cc\u666f)",
+      "1": "thoracic vertebra (\u80f8\u690e)",
+      "2": "left rib (\u5de6\u4fa7\u808b\u9aa8)",
+      "3": "right rib (\u53f3\u4fa7\u808b\u9aa8)",
+      "4": "left heart (\u5de6\u4fa7\u5fc3\u810f)",
+      "5": "right heart (\u53f3\u4fa7\u5fc3\u810f)",
+      "6": "thorax (\u80f8\u8154)"
+    },
+    "label_ids_note": "Existing label_ids values above are the historical archive placeholders and are intentionally unchanged; label_semantics_confirmed records the confirmed anatomical meaning for the same numeric IDs. No renumbering, no pixel changes.",
     "num_training": 621,
     "num_external_test": 853,
     "cohorts": {

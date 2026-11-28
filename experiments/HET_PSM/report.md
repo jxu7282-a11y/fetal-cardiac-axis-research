@@ -37,6 +37,7 @@
 
 ### 3.2 Side Membership 映射与 Loss
 - 目标（来自增强后的分割 GT，同 patch）： `ID 1,2 → Left(ch0)`；`ID 3,4 → Right(ch1)`；其余（含 5–9）**忽略/掩码**，不宣称 5–9 解剖含义。
+- 【语义注记 2026-11-28】中孕标签已确认（`docs/project/06_LABEL_SEMANTICS.md`）：ID1=左心房、ID2=左心室、ID3=右心房、ID4=右心室，与 side target 的 `1,2→Left / 3,4→Right` 一致；ID5=胸椎、ID6=胸腔、ID7=心内缘、ID8=未知区域（与心轴角测算无关）、ID9=室间隔。此注记不改变已训练权重、训练时使用的掩码规则或任何指标。
 - Loss：`L_total = L_seg + 0.1 · L_side`。
   - `L_seg`：nnUNet 默认 DC+CE + deep supervision（不变）。
   - `L_side`：`MaskedBCEWithLogits`，逐例 mean，再对有效例 mean；权重 0.1。

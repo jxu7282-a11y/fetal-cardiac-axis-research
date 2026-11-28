@@ -56,3 +56,13 @@ monitoring,label_9_dice,fold_all_in_sample,0.9659,dice,semantics unconfirmed
 compatibility,non_seg_keys_matched,mid_vs_e0,382,keys,name and shape match
 compatibility,seg_layers_skipped,mid_vs_e0,14,keys,7-class E0 versus 10-class mid output head
 integrity,checkpoint_final_sha256,server_weight,df94a1d9aac1557a50d63856d684ef236508b45731dbcfd3479c85493314cd9f,sha256,weight not included in Git
+label_semantics,id_0,background,confirmed,2026-11-28,user-confirmed meaning from docs/project/06_LABEL_SEMANTICS.md; label numbering and pixel values unchanged
+label_semantics,id_1,left atrium,confirmed,2026-11-28,user-confirmed meaning from docs/project/06_LABEL_SEMANTICS.md; label numbering and pixel values unchanged
+label_semantics,id_2,left ventricle,confirmed,2026-11-28,user-confirmed meaning from docs/project/06_LABEL_SEMANTICS.md; label numbering and pixel values unchanged
+label_semantics,id_3,right atrium,confirmed,2026-11-28,user-confirmed meaning from docs/project/06_LABEL_SEMANTICS.md; label numbering and pixel values unchanged
+label_semantics,id_4,right ventricle,confirmed,2026-11-28,user-confirmed meaning from docs/project/06_LABEL_SEMANTICS.md; label numbering and pixel values unchanged
+label_semantics,id_5,thoracic vertebra,confirmed,2026-11-28,user-confirmed meaning from docs/project/06_LABEL_SEMANTICS.md; label numbering and pixel values unchanged
+label_semantics,id_6,thorax,confirmed,2026-11-28,user-confirmed meaning from docs/project/06_LABEL_SEMANTICS.md; label numbering and pixel values unchanged
+label_semantics,id_7,endocardial border,confirmed,2026-11-28,user-confirmed meaning from docs/project/06_LABEL_SEMANTICS.md; label numbering and pixel values unchanged
+label_semantics,id_8,unknown region (unrelated to cardiac-axis measurement),confirmed,2026-11-28,user-confirmed meaning from docs/project/06_LABEL_SEMANTICS.md; label numbering and pixel values unchanged
+label_semantics,id_9,interventricular septum,confirmed,2026-11-28,user-confirmed meaning from docs/project/06_LABEL_SEMANTICS.md; label numbering and pixel values unchanged

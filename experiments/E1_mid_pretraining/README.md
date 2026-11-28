@@ -14,6 +14,12 @@ The run used `nnUNetPlansFrom501`, an independent plans identifier created from 
 early-trimester E0 plans through nnU-Net's official plans-transfer mechanism. The E0
 dataset, split, plans, code, and model were not modified.
 
+Label semantics for the 10 mid-trimester classes were confirmed after training
+(0 background, 1 left atrium, 2 left ventricle, 3 right atrium, 4 right ventricle,
+5 thoracic vertebra, 6 thorax, 7 endocardial border, 8 unknown region unrelated to
+cardiac-axis measurement, 9 interventricular septum). Training used neutral
+placeholders; the 10-class head, weights and metrics are unchanged.
+
 ## Contents
 
 | File | Content |
@@ -32,7 +38,7 @@ dataset, split, plans, code, and model were not modified.
 | Deduplicated cases | 890 |
 | Valid training cases | 890 |
 | Image/mask match | 890/890 |
-| Label IDs | 0–9 (10 classes; semantics 1–9 unconfirmed) |
+| Label IDs | 0–9 (10 classes; semantics 1–9 confirmed 2026-11-28, see `docs/project/06_LABEL_SEMANTICS.md`) |
 | Epochs completed | 300/300 |
 | Fold | `all` |
 | Same-data monitoring Dice | 0.9784 |

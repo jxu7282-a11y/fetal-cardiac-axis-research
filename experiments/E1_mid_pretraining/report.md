@@ -69,15 +69,37 @@ Additional audit note: `roi_box` (all 905 cases) and at least one `landmark` (98
 
 The masks use integer label IDs **0–9**, ten classes in total. Every retained case
 contains all ten IDs. ID 0 is `background` under the nnU-Net convention. No authoritative
-mid-trimester label dictionary or label-name field was available.
+mid-trimester label dictionary or label-name field was available **at training time**.
 
-Therefore:
+Therefore, during training:
 
-- IDs 1–9 remain **neutral placeholders** `label_1`…`label_9`;
+- IDs 1–9 were **neutral placeholders** `label_1`…`label_9`;
 - no anatomical name was assigned or inferred;
 - no label was deleted, merged, or renumbered;
 - the original-to-nnU-Net mapping is reversible identity `0→0 … 9→9`;
 - no mid-trimester label was equated with an early-trimester label.
+
+**Post-hoc semantics confirmation (2026-11-28).** The user has since confirmed the
+anatomical meaning of all ten classes, now recorded in
+`docs/project/06_LABEL_SEMANTICS.md`:
+
+| ID | Confirmed semantics |
+|---:|---|
+| 0 | background |
+| 1 | left atrium |
+| 2 | left ventricle |
+| 3 | right atrium |
+| 4 | right ventricle |
+| 5 | thoracic vertebra |
+| 6 | thorax |
+| 7 | endocardial border |
+| 8 | unknown region (unrelated to cardiac-axis measurement; no anatomical name assigned) |
+| 9 | interventricular septum |
+
+This confirmation is documentation only: it does not change the 10-class output head,
+trained weights, mask pixel values, label numbering, or any metric in this archive.
+Early- and mid-trimester IDs are independent systems — e.g. early ID1 (thoracic
+vertebra) corresponds to mid ID5 (thoracic vertebra), not mid ID1 (left atrium).
 
 Aggregate label totals for the 890 retained masks are recorded in
 `metrics/data_audit_summary.csv`. These totals describe class prevalence only; they do
@@ -166,8 +188,9 @@ to aggregate counts, configuration, rules, and monitoring metrics.
 
 ## 7. Limitations and open issues
 
-1. The anatomical semantics and boundary definitions of labels 1–9 remain unconfirmed;
-   they remain neutral IDs.
+1. The anatomical semantics of labels 1–9 are now confirmed
+   (`docs/project/06_LABEL_SEMANTICS.md`); the detailed boundary definitions and the
+   per-class transferable-supervision scope remain open.
 2. The 15 excluded duplicate cases have non-identical masks. Deterministic selection is
    not evidence that the retained annotation is clinically superior. The original files
    remain untouched on the server.

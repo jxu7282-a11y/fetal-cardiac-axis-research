@@ -70,14 +70,18 @@ All folds completed 300/300 epochs. No OOM, no CUDA error, no dataloader failure
 
 Per-class Dice (mean over folds, internal 621):
 
-| Label | Semantics | Dice | HD95 (px) |
-|---|---|---|---|
-| 1 | reference center | 0.9152 | 11.13 |
-| 2 | label_2 (unused by geometry) | 0.8810 | 22.53 |
-| 3 | label_3 (unused by geometry) | 0.9168 | 16.72 |
-| 4 | cardiac region 4 | **0.9682** | **2.93** |
-| 5 | cardiac region 5 | **0.9668** | **2.87** |
-| 6 | thorax reference | 0.9644 | 8.26 |
+| Label | Anatomical semantics (confirmed) | Geometry role (archive placeholder) | Dice | HD95 (px) |
+|---|---|---|---|---|
+| 1 | 胸椎 (thoracic vertebra) | reference center | 0.9152 | 11.13 |
+| 2 | 左侧肋骨 (left rib) | label_2 (unused by geometry) | 0.8810 | 22.53 |
+| 3 | 右侧肋骨 (right rib) | label_3 (unused by geometry) | 0.9168 | 16.72 |
+| 4 | 左侧心脏 (left heart) | cardiac region 4 | **0.9682** | **2.93** |
+| 5 | 右侧心脏 (right heart) | cardiac region 5 | **0.9668** | **2.87** |
+| 6 | 胸腔 (thorax) | thorax reference | 0.9644 | 8.26 |
+
+Label semantics are user-confirmed and recorded in `docs/project/06_LABEL_SEMANTICS.md`; the
+"geometry role" column keeps the historical archive placeholders. Numeric IDs and pixel values
+are unchanged.
 
 Summary:
 

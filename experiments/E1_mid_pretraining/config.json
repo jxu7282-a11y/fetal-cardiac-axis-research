@@ -22,7 +22,21 @@
       "8": "label_8",
       "9": "label_9"
     },
-    "label_semantics": "Only background is assigned by nnU-Net convention. Labels 1-9 are neutral placeholders; no anatomical meaning was inferred.",
+    "label_semantics": "Only background is assigned by nnU-Net convention. Labels 1-9 were neutral placeholders during training; no anatomical meaning was inferred at training time.",
+    "label_semantics_confirmed": {
+      "source": "docs/project/06_LABEL_SEMANTICS.md (user-confirmed 2026-11-28)",
+      "note": "Confirmed after training; does not change the 10-class output head, weights, pixel values or historical metrics.",
+      "0": "background (\u80cc\u666f)",
+      "1": "left atrium (\u5de6\u5fc3\u623f)",
+      "2": "left ventricle (\u5de6\u5fc3\u5ba4)",
+      "3": "right atrium (\u53f3\u5fc3\u623f)",
+      "4": "right ventricle (\u53f3\u5fc3\u5ba4)",
+      "5": "thoracic vertebra (\u80f8\u690e)",
+      "6": "thorax (\u80f8\u8154)",
+      "7": "endocardial border (\u5fc3\u5185\u7f18)",
+      "8": "unknown region, unrelated to cardiac-axis measurement (\u672a\u77e5\u533a\u57df)",
+      "9": "interventricular septum (\u5ba4\u95f4\u9694)"
+    },
     "label_mapping": {
       "type": "identity",
       "reversible": true,
