@@ -1,0 +1,7 @@
+axis,cohort,n,const_baseline_Laxis
+card,retrospective,621,0.6232616717564992
+card,multicenter,442,0.8144758610497778
+card,prospective,411,0.6197007016061123
+ref,retrospective,621,0.7259704959727363
+ref,multicenter,442,0.9077606033955795
+ref,prospective,411,0.6659540087419762

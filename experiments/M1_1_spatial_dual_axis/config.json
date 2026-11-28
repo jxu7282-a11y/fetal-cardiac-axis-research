@@ -1,0 +1,181 @@
+{
+  "experiment_id": "M1.1",
+  "name": "Spatial-preserving Dual-axis Auxiliary Supervision",
+  "version": "m1.1-spatial-dual-axis-v1.0",
+  "status": "complete (5/5 folds x 300 epochs; formal evaluation and auxiliary-head analysis done)",
+  "archived_at": "2026-11-28T12:00:00+08:00",
+  "relationship_to_M1": {
+    "role": "minimal controlled follow-up ablating M1's GAP pooling",
+    "sole_model_change": {
+      "before": "AdaptiveAvgPool2d(1) -> Flatten -> Linear(C, 2)",
+      "after": "AdaptiveAvgPool2d((4,4)) -> Flatten -> Linear(16*C, 2)",
+      "c": 32,
+      "aux_params_before_per_head": 66,
+      "aux_params_after_per_head": 1026,
+      "aux_params_before_total": 132,
+      "aux_params_after_total": 2052
+    },
+    "unchanged": [
+      "dual-axis Card/Reference auxiliary task",
+      "auxiliary labels and double-angle definition",
+      "loss type, weight (0.1) and normalisation",
+      "main segmentation network, encoder, decoder, segmentation head",
+      "deep supervision",
+      "data, folds, plans, 300 epochs, seed/initialisation mode",
+      "augmentation and axis-label transforms",
+      "inference contract: network(x) returns ONLY segmentation logits"
+    ]
+  },
+  "dataset": {
+    "task": "Dataset501_EarlyRetroCardiac",
+    "configuration": "2d",
+    "plans": "nnUNetPlans (E0 originals, not regenerated)",
+    "num_training": 621,
+    "formal_total": 1474,
+    "cohorts": {
+      "retrospective": {"total": 621, "Ne": 571, "Po": 50, "role": "5-fold development, OOF evaluation"},
+      "multicenter": {"total": 442, "Ne": 434, "Po": 8, "role": "external test"},
+      "prospective": {"total": 411, "Ne": 400, "Po": 11, "role": "prospective test"}
+    },
+    "splits": "E0 original five-fold split (local/nnunet_preprocessed/.../splits_final.json), not regenerated",
+    "ground_truth": "frozen E0 label_gold + TAR manual lines (fixed_gt_v1.csv); label_infer never used"
+  },
+  "network_architecture": {
+    "backbone": "E0 PlainConvUNet unchanged (verified bit-identical to a same-seed M1/E0 build; 396 backbone tensors)",
+    "inference_path": "network(x) returns ONLY the original segmentation logits (7-ch, deep supervision)",
+    "aux_heads": {
+      "module": "SpatialDualAxisAuxHeads",
+      "per_head": "AdaptiveAvgPool2d((4,4)) -> Flatten -> Linear(16*C_dec, 2)",
+      "num_heads": 2,
+      "head_names": ["card", "ref"],
+      "input_feature": "final decoder stage feature (same tensor feeding seg_layers[-1])",
+      "input_channels": 32,
+      "pooled_shape": "[B, 32, 4, 4] -> Flatten -> [B, 512]",
+      "output_per_head": "[B, 2] unnormalised double-angle vector [cos 2theta, sin 2theta]",
+      "decode": "angle = atan2(v1, v0)/2 (mod 180)",
+      "aux_params_per_head": "2x512 + 2 = 1026",
+      "aux_params_total": 2052
+    },
+    "segmentation_output_unchanged": true,
+    "deep_supervision_unchanged": true
+  },
+  "loss": {
+    "segmentation": "E0 inherited (CompoundLoss: Dice + CE, with deep supervision) - unchanged",
+    "axis": "L_axis = 1 - dot(q_pred_normalised, q_gt); q(theta) = [cos 2theta, sin 2theta]",
+    "auxiliary": "L_aux = (L_card + L_ref) / 2, each averaged over its own valid samples",
+    "total": "L_total = L_seg + 0.1 * L_aux",
+    "aux_weight": 0.1,
+    "missing_label_handling": "missing/NaN axis labels only mask the corresponding aux loss; case kept in segmentation training"
+  },
+  "training": {
+    "nnunet_version": "2.8.1",
+    "torch_version": "2.7.1+cu118",
+    "trainer": "nnUNetTrainer_M1_1SpatialDualAxis",
+    "trainer_parent": "nnUNetTrainer_M1DualAxis (inherits data pipeline, loss, train_step)",
+    "configuration": "2d",
+    "epochs": 300,
+    "folds": [0, 1, 2, 3, 4],
+    "init": "scratch from epoch 0 (no mid-trimester data, no E2/E3/M1 weights)",
+    "optimizer": "inherited E0 default (SGD, momentum 0.99, nesterov, weight_decay 3e-5)",
+    "learning_rate": "inherited E0 default (0.01, PolyLR over 300 epochs)",
+    "batch_size": 5,
+    "patch_size": [768, 768],
+    "physical_gpu": 3,
+    "fivefold_completeness": {
+      "all_folds_reached_300_epochs": true,
+      "exit_codes": {"fold_0": 0, "fold_1": 0, "fold_2": 0, "fold_3": 0, "fold_4": 0},
+      "mean_validation_dice_per_fold": {"fold_0": 0.9377, "fold_1": 0.9323, "fold_2": 0.9364, "fold_3": 0.9392, "fold_4": 0.9325},
+      "checkpoint_best_saved_epoch": {"fold_0": 300, "fold_1": 298, "fold_2": 283, "fold_3": 297, "fold_4": 298},
+      "checkpoint_final_epoch": {"fold_0": 300, "fold_1": 300, "fold_2": 300, "fold_3": 300, "fold_4": 300}
+    },
+    "checkpoint_sha256": {
+      "fold_0/checkpoint_best.pth": "c35db1219903e6ebea7cb618aadd5024731edf218cdf064805c114add11b0d76",
+      "fold_1/checkpoint_best.pth": "e3e1073c5273d68ca9229d93271da883b913ed3bb8ec0aba5556c79bca8e8eaf",
+      "fold_2/checkpoint_best.pth": "5afbfb219dcaf3e74038011ae69c7d17945d2c0822bd7c2ba899e36388d2bf9e",
+      "fold_3/checkpoint_best.pth": "c524f304b2f5eda794f88955248c1907f634796098526844ce80ebed59d70039",
+      "fold_4/checkpoint_best.pth": "a52dc4cf4a131873749c7415a3239b1f552f067b8904d1fc2aada9af18a7aafd",
+      "fold_0/checkpoint_final.pth": "e671a53a9ebfa0dededae39e89750b985c6d60d056cffa626e5e20db57aaba89",
+      "fold_1/checkpoint_final.pth": "31ab81956550cb7c3bb6849cd9196904b219798fefd71dfed612d47fabb92fbe",
+      "fold_2/checkpoint_final.pth": "ff4093e15ed18c3ba3fbba2cff6d64cd1fead7b175ba95b5b6e905fc2314ec01",
+      "fold_3/checkpoint_final.pth": "3549cf6e821ff4f73bd1fabb807db83f3a62c65592cd3a6db03d22ed87b15a60",
+      "fold_4/checkpoint_final.pth": "21bb2d8a21c5b097b29c7a4ef647d8383da0a94d642a436645209a2d0737b8b4"
+    }
+  },
+  "smoke_test": {
+    "result": "PASS (GPU 3, 1 shortened epoch)",
+    "backbone_identical_to_m1": true,
+    "segmentation_identical_to_m1": true,
+    "main_network_param_equal": true,
+    "pool_size": 4,
+    "aux_fc_in_features": 512,
+    "aux_params_total": 2052,
+    "aux_output_not_constant": true,
+    "aux_output_unit_std_max": 0.468,
+    "loss_finite": true,
+    "gradients_finite": true,
+    "aux_gradients_nonzero": true
+  },
+  "unit_tests": {
+    "command": "python -m unittest experiments.M1_1_spatial_dual_axis.tests.test_spatial_aux_heads experiments.M1_1_spatial_dual_axis.tests.test_m1_1_trainer -v",
+    "result": "21 tests OK"
+  },
+  "inference": {
+    "internal_validation": {"tta": false, "checkpoint": "checkpoint_best.pth", "protocol": "per-fold OOF, each case predicted by the fold model that did not train on it", "n_cases": 621},
+    "external_test": {"tta": false, "checkpoint": "checkpoint_best.pth", "protocol": "5-fold ensemble", "n_cases": 853},
+    "note": "TTA disabled to keep internal and external protocols identical to E0/E2/E3/M1"
+  },
+  "geometry_postprocessing": {
+    "card_axis": "OBB long axis of largest connected component of id4 and id5, weighted by area*max(aspect-1,0.05), double-angle weighted mean",
+    "ref_axis": "id6 centroid -> id1 centroid",
+    "full_angle": "acute angle between card_axis and ref_axis",
+    "resampling": "none; no pixel-level mapping between TAR and segmentation images",
+    "unchanged_from": "E0/E2/E3/M1 (src/cardiac_axis/evaluate.py fixed_geometry)"
+  },
+  "headline_results": {
+    "full_angle_degrees": {
+      "internal_M1_1": {"n": 621, "full_MAE": 3.700, "full_MedAE": 2.737, "full_P90": 7.389, "full_P95": 10.02, "card_MAE": 3.155, "ref_MAE": 2.603, "dice": 0.9329, "hd95": 11.09},
+      "external_M1_1": {"n": 853, "full_MAE": 3.719, "full_MedAE": 2.976, "full_P90": 7.444, "full_P95": 9.65, "card_MAE": 2.948, "ref_MAE": 2.911, "dice": 0.9295, "hd95": 16.51}
+    },
+    "paired_bootstrap_vs_baselines": {
+      "method": "paired bootstrap 10000 resamples, seed 42; delta = M1.1 - baseline",
+      "internal_ALL_full_vs_E0": {"delta": 0.061, "ci": [-0.106, 0.248], "significant": false},
+      "internal_ALL_full_vs_E2": {"delta": 0.093, "ci": [-0.085, 0.280], "significant": false},
+      "internal_ALL_full_vs_E3": {"delta": 0.054, "ci": [-0.131, 0.244], "significant": false},
+      "internal_ALL_full_vs_M1": {"delta": -0.114, "ci": [-0.291, 0.071], "significant": false},
+      "external_ALL_full_vs_E0": {"delta": -0.021, "ci": [-0.164, 0.153], "significant": false},
+      "external_ALL_full_vs_E2": {"delta": -0.141, "ci": [-0.360, 0.061], "significant": false},
+      "external_ALL_full_vs_E3": {"delta": 0.026, "ci": [-0.171, 0.199], "significant": false},
+      "external_ALL_full_vs_M1": {"delta": 0.027, "ci": [-0.119, 0.206], "significant": false},
+      "summary": "No Full Angle comparison is statistically significant; every 95% CI includes 0."
+    },
+    "aux_head_independent_accuracy": {
+      "internal_card": {"n": 621, "MAE": 4.396, "pearson_r": 0.969, "R2": 0.938, "CCC": 0.969},
+      "internal_ref":  {"n": 621, "MAE": 4.232, "pearson_r": 0.807, "R2": 0.612, "CCC": 0.806},
+      "external_card": {"n": 853, "MAE": 4.246, "pearson_r": 0.989, "R2": 0.978, "CCC": 0.989},
+      "external_ref":  {"n": 853, "MAE": 4.224, "pearson_r": 0.849, "R2": 0.701, "CCC": 0.849},
+      "constant_baseline_axis_MAE_deg": "31-41 (aux is ~7-9x better than any constant)",
+      "summary": "Aux heads encode genuine per-case angle info (not constant); Card stronger than Ref."
+    },
+    "aux_head_vs_mask_derived": {
+      "internal_full": {"aux_MAE": 5.596, "mask_MAE": 3.700, "delta": 1.896, "ci": [1.495, 2.296], "mask_better": true},
+      "external_full": {"aux_MAE": 5.731, "mask_MAE": 3.719, "delta": 2.012, "ci": [1.555, 2.471], "mask_better": true},
+      "summary": "Mask-derived geometry is significantly better than the aux head on every axis/cohort; aux has a lower tail on some Po cases (exploratory)."
+    },
+    "failures": {
+      "internal_measurement_failures": 0,
+      "external_measurement_failures": 0,
+      "note": "E3 and M1 each had 1 internal full-angle-unavailable case; M1.1 loses none"
+    }
+  },
+  "verdict": {
+    "statistical_fact": "M1.1 is statistically indistinguishable from E0/E2/E3/M1 on Full Angle MAE/P95 and Card/Ref axis error, internal OOF and external; segmentation on par.",
+    "mechanistic_inference": "4x4 spatial pooling fixed M1's GAP collapse (aux loss 0.005 << constant floor ~0.62-0.91, non-constant predictions), confirming the mechanism, but the auxiliary objective is not wired tightly enough to the segmentation/geometry path to move the clinical endpoint.",
+    "met_expectations": "Yes as a mechanism check (aux collapse fixed); No as a clinical measurement improvement.",
+    "artifact_locations_local_only": {
+      "weights": "local/m1_1_spatial_dual_axis/results_nnunet/Dataset501_EarlyRetroCardiac/nnUNetTrainer_M1_1SpatialDualAxis__nnUNetPlans__2d/fold_{0..4}/checkpoint_{best,final}.pth",
+      "evaluation": "local/m1_1_spatial_dual_axis/evaluation/",
+      "analysis": "local/m1_1_spatial_dual_axis/analysis/",
+      "logs": "local/m1_1_spatial_dual_axis/logs/"
+    }
+  }
+}

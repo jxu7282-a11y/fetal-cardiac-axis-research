@@ -1,0 +1,243 @@
+{
+  "int": {
+    "models": {
+      "M1.1": 621,
+      "E0": 621,
+      "E2": 621,
+      "E3": 621,
+      "M1": 621
+    },
+    "uid_sets_identical_to_E0": {
+      "M1.1": true,
+      "E0": true,
+      "E2": true,
+      "E3": true,
+      "M1": true
+    },
+    "duplicate_uid": {
+      "M1.1": 0,
+      "E0": 0,
+      "E2": 0,
+      "E3": 0,
+      "M1": 0
+    },
+    "nan_error_counts": {
+      "M1.1": {
+        "full_error": 0,
+        "card_error": 0,
+        "ref_error": 0
+      },
+      "E0": {
+        "full_error": 0,
+        "card_error": 0,
+        "ref_error": 0
+      },
+      "E2": {
+        "full_error": 0,
+        "card_error": 0,
+        "ref_error": 0
+      },
+      "E3": {
+        "full_error": 1,
+        "card_error": 0,
+        "ref_error": 1
+      },
+      "M1": {
+        "full_error": 1,
+        "card_error": 0,
+        "ref_error": 1
+      }
+    },
+    "invalid_pred": {
+      "M1.1": 0,
+      "E0": 0,
+      "E2": 0,
+      "E3": 0,
+      "M1": 0
+    },
+    "cohort_counts": {
+      "M1.1": {
+        "retrospective": 621
+      },
+      "E0": {
+        "retrospective": 621
+      },
+      "E2": {
+        "retrospective": 621
+      },
+      "E3": {
+        "retrospective": 621
+      },
+      "M1": {
+        "retrospective": 621
+      }
+    },
+    "class_counts": {
+      "M1.1": {
+        "Ne": 571,
+        "Po": 50
+      },
+      "E0": {
+        "Ne": 571,
+        "Po": 50
+      },
+      "E2": {
+        "Ne": 571,
+        "Po": 50
+      },
+      "E3": {
+        "Ne": 571,
+        "Po": 50
+      },
+      "M1": {
+        "Ne": 571,
+        "Po": 50
+      }
+    },
+    "gt_identical_to_E0": {
+      "M1.1:manual_full_angle": true,
+      "E2:manual_full_angle": true,
+      "E3:manual_full_angle": true,
+      "M1:manual_full_angle": true,
+      "M1.1:manual_card_axis": true,
+      "E2:manual_card_axis": true,
+      "E3:manual_card_axis": true,
+      "M1:manual_card_axis": true,
+      "M1.1:manual_ref_axis": true,
+      "E2:manual_ref_axis": true,
+      "E3:manual_ref_axis": true,
+      "M1:manual_ref_axis": true
+    }
+  },
+  "ext": {
+    "models": {
+      "M1.1": 853,
+      "E0": 853,
+      "E2": 853,
+      "E3": 853,
+      "M1": 853
+    },
+    "uid_sets_identical_to_E0": {
+      "M1.1": true,
+      "E0": true,
+      "E2": true,
+      "E3": true,
+      "M1": true
+    },
+    "duplicate_uid": {
+      "M1.1": 0,
+      "E0": 0,
+      "E2": 0,
+      "E3": 0,
+      "M1": 0
+    },
+    "nan_error_counts": {
+      "M1.1": {
+        "full_error": 0,
+        "card_error": 0,
+        "ref_error": 0
+      },
+      "E0": {
+        "full_error": 0,
+        "card_error": 0,
+        "ref_error": 0
+      },
+      "E2": {
+        "full_error": 0,
+        "card_error": 0,
+        "ref_error": 0
+      },
+      "E3": {
+        "full_error": 0,
+        "card_error": 0,
+        "ref_error": 0
+      },
+      "M1": {
+        "full_error": 0,
+        "card_error": 0,
+        "ref_error": 0
+      }
+    },
+    "invalid_pred": {
+      "M1.1": 0,
+      "E0": 0,
+      "E2": 0,
+      "E3": 0,
+      "M1": 0
+    },
+    "cohort_counts": {
+      "M1.1": {
+        "multicenter": 442,
+        "prospective": 411
+      },
+      "E0": {
+        "multicenter": 442,
+        "prospective": 411
+      },
+      "E2": {
+        "multicenter": 442,
+        "prospective": 411
+      },
+      "E3": {
+        "multicenter": 442,
+        "prospective": 411
+      },
+      "M1": {
+        "multicenter": 442,
+        "prospective": 411
+      }
+    },
+    "class_counts": {
+      "M1.1": {
+        "Ne": 834,
+        "Po": 19
+      },
+      "E0": {
+        "Ne": 834,
+        "Po": 19
+      },
+      "E2": {
+        "Ne": 834,
+        "Po": 19
+      },
+      "E3": {
+        "Ne": 834,
+        "Po": 19
+      },
+      "M1": {
+        "Ne": 834,
+        "Po": 19
+      }
+    },
+    "gt_identical_to_E0": {
+      "M1.1:manual_full_angle": true,
+      "E2:manual_full_angle": true,
+      "E3:manual_full_angle": true,
+      "M1:manual_full_angle": true,
+      "M1.1:manual_card_axis": true,
+      "E2:manual_card_axis": true,
+      "E3:manual_card_axis": true,
+      "M1:manual_card_axis": true,
+      "M1.1:manual_ref_axis": true,
+      "E2:manual_ref_axis": true,
+      "E3:manual_ref_axis": true,
+      "M1:manual_ref_axis": true
+    }
+  },
+  "sources": {
+    "E0_int": "local/phase0/eval_E0_5fold_pooled_cases_withfold.csv",
+    "E2_int": "local/e2_mid_to_early_finetune/evaluation/internal_case_level_metrics.csv",
+    "E3_int": "local/e3_encoder_only_transfer/evaluation/internal_case_level_metrics.csv",
+    "M1_int": "local/m1_measurement_aware/evaluation/internal_case_level_metrics.csv",
+    "E0_ext": "local/phase0/eval_E0_external_cases_extonly.csv",
+    "E2_ext": "local/e2_mid_to_early_finetune/evaluation/external_case_level_metrics.csv",
+    "E3_ext": "local/e3_encoder_only_transfer/evaluation/external_case_level_metrics.csv",
+    "M1_ext": "local/m1_measurement_aware/evaluation/external_case_level_metrics.csv"
+  },
+  "m11_predictions": {
+    "internal": "local/m1_1_spatial_dual_axis/evaluation/internal_pred_best/fold_{0..4}",
+    "external": "local/m1_1_spatial_dual_axis/evaluation/external_pred_ensemble",
+    "checkpoint": "checkpoint_best.pth",
+    "tta": false
+  }
+}
